@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GitHub & Git 高频词全集 · Pro 学习卡</title>
+<style>
+  :root {
+    --bg: #0d1117; --card: #161b22; --card2: #1c2128; --border: #30363d;
+    --accent: #58a6ff; --accent2: #1f6feb; --green: #3fb950; --red: #f85149;
+    --yellow: #d29922; --orange: #db6d28; --purple: #bc8cff; --pink: #f778ba;
+    --text: #e6edf3; --text2: #8b949e; --code-bg: #0d1117;
+    --sidebar-w: 260px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.7;
+    display: flex; min-height: 100vh;
+  }
+  .sidebar {
+    width: var(--sidebar-w); background: var(--card);
+    border-right: 1px solid var(--border); height: 100vh;
+    position: fixed; top:0; left:0; overflow-y: auto;
+    padding: 20px 0; z-index: 10;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar-brand {
+    padding: 0 20px 16px; border-bottom: 1px solid var(--border); margin-bottom: 12px;
+  }
+  .sidebar-brand h2 {
+    font-size: 15px; font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .sidebar-brand .sb-sub {
+    font-size: 11px; color: var(--text2); margin-top: 2px;
+  }
+  .cat-label {
+    font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+    color: var(--text2); padding: 12px 20px 4px; font-weight: 700;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 20px; cursor: pointer; font-size: 13px;
+    color: var(--text2); transition: all 0.15s;
+    border-left: 3px solid transparent;
+  }
+  .nav-item:hover {
+    color: var(--text); background: rgba(88,166,255,0.06);
+  }
+  .nav-item.active {
+    color: var(--accent); background: rgba(88,166,255,0.08);
+    border-left-color: var(--accent); font-weight: 600;
+  }
+  .nav-item .ni-count {
+    margin-left: auto; font-size: 11px; color: var(--text2);
+    background: var(--bg); padding: 1px 7px; border-radius: 10px;
+  }
+  .sidebar-progress {
+    padding: 16px 20px; border-top: 1px solid var(--border); margin-top: 12px;
+  }
+  .sp-label { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+  .sp-bar { height: 4px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .sp-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--green)); border-radius: 4px; transition: width 0.4s ease; }
+  .sp-num { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  .main { margin-left: var(--sidebar-w); flex: 1; padding: 28px 36px 60px; max-width: 920px; }
+  .main-header { margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--border); }
+  .main-header h1 { font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+  .main-header .sub { color: var(--text2); font-size: 13px; }
+  .stats-row { display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+  .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; min-width: 110px; flex: 1; }
+  .stat-card .sc-val { font-size: 22px; font-weight: 800; }
+  .stat-card .sc-label { font-size: 11px; color: var(--text2); margin-top: 2px; }
+  .stat-card.total  .sc-val { color: var(--accent); }
+  .stat-card.learned .sc-val { color: var(--green); }
+  .stat-card.quizzed .sc-val { color: var(--yellow); }
+  .stat-card.right   .sc-val { color: var(--purple); }
+
+  .search-box { margin-bottom: 20px; position: relative; }
+  .search-box input {
+    width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 8px;
+    padding: 9px 14px 9px 38px; color: var(--text); font-size: 14px; outline: none; font-family: inherit;
+  }
+  .search-box input::placeholder { color: var(--text2); }
+  .search-box input:focus { border-color: var(--accent); }
+  .search-box .si { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 15px; }
+
+  .filter-bar { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-tag {
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border); color: var(--text2); background: var(--card);
+    transition: all 0.15s; font-family: inherit;
+  }
+  .filter-tag:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-tag.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+  .word-list { display: flex; flex-direction: column; gap: 12px; }
+  .word-card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .word-card:hover { border-color: var(--accent); }
+  .word-card.expanded { border-color: var(--accent2); }
+  .word-card-header {
+    display: flex; align-items: center; gap: 12px; padding: 16px 20px;
+    cursor: pointer; user-select: none; flex-wrap: wrap;
+  }
+  .word-card-header .wc-num { font-size: 11px; color: var(--text2); font-weight: 700; min-width: 28px; }
+  .word-card-header .wc-en { font-size: 19px; font-weight: 700; flex: 1; }
+  .word-card-header .wc-phonetic { font-size: 13px; color: var(--text2); font-style: italic; }
+  .word-card-header .wc-pos { font-size: 11px; background: rgba(210,153,34,0.12); color: var(--yellow); padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .word-card-header .wc-arrow { color: var(--text2); font-size: 12px; transition: transform 0.2s; }
+  .word-card.expanded .wc-arrow { transform: rotate(180deg); }
+  .word-card-header .wc-check { color: var(--green); font-size: 15px; display: none; }
+  .word-card.learned .wc-check { display: inline; }
+  .word-card.learned .wc-en { color: var(--text2); }
+
+  .word-card-body {
+    max-height: 0; overflow: hidden;
+    transition: max-height 0.35s ease, padding 0.35s ease;
+    padding: 0 20px;
+  }
+  .word-card.expanded .word-card-body { max-height: 3000px; padding: 0 20px 18px; }
+
+  .wc-cn { font-size: 15px; color: var(--text); margin-bottom: 12px; font-weight: 500; }
+  .section-title {
+    font-size: 10px; color: var(--accent); font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1.5px;
+    margin-bottom: 6px; margin-top: 12px;
+  }
+  .git-demo {
+    background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; margin-bottom: 8px; border-left: 3px solid var(--accent);
+  }
+  .git-demo .cmd {
+    font-family: 'SF Mono', 'Fira Code', monospace; color: var(--green);
+    font-size: 12.5px; line-height: 1.7;
+  }
+  .git-demo .explain { color: var(--text2); font-size: 12px; margin-top: 2px; }
+  .git-demo .output {
+    color: var(--text2); font-size: 12px; font-family: 'SF Mono', monospace;
+    margin-top: 5px; padding-left: 10px; border-left: 2px solid var(--border);
+    line-height: 1.7; white-space: pre-line;
+  }
+  .tip-box {
+    background: rgba(63,185,80,0.06); border-left: 3px solid var(--green);
+    border-radius: 0 8px 8px 0; padding: 10px 14px; margin: 10px 0;
+    font-size: 12.5px; color: var(--text2); line-height: 1.7;
+  }
+  .tip-box strong { color: var(--green); }
+
+  .quiz {
+    background: rgba(88,166,255,0.05); border: 1px solid rgba(88,166,255,0.12);
+    border-radius: 10px; padding: 14px; margin-top: 10px;
+  }
+  .quiz-q { font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 6px; }
+  .quiz-opt {
+    background: var(--card); border: 1px solid var(--border); color: var(--text);
+    padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 12.5px;
+    text-align: left; font-family: inherit; transition: all 0.15s;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); background: rgba(88,166,255,0.06); }
+  .quiz-opt.correct { border-color: var(--green) !important; background: rgba(63,185,80,0.1) !important; color: var(--green); }
+  .quiz-opt.wrong { border-color: var(--red) !important; background: rgba(248,81,73,0.1) !important; color: var(--red); }
+  .quiz-opt:disabled { cursor: default; opacity: 0.65; }
+  .quiz-result { margin-top: 8px; font-size: 13px; font-weight: 600; display: none; }
+  .quiz-result.show { display: block; }
+  .quiz-result.pass { color: var(--green); }
+  .quiz-result.fail { color: var(--red); }
+
+  .mark-learned-btn {
+    margin-top: 12px; background: none; border: 1px solid var(--border);
+    color: var(--text2); padding: 6px 14px; border-radius: 6px; cursor: pointer;
+    font-size: 12px; font-family: inherit; transition: all 0.15s;
+  }
+  .mark-learned-btn:hover { border-color: var(--green); color: var(--green); }
+  .mark-learned-btn.done { border-color: var(--green); color: var(--green); background: rgba(63,185,80,0.08); }
+
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--text2); }
+
+  /* 模式Tab */
+  .mode-tabs { display:flex; gap:4px; margin:0 0 18px; flex-wrap:wrap; }
+  .mode-tab { padding:6px 14px; border-radius:8px; font-size:12px; font-weight:700; cursor:pointer; color:var(--text2); border:1px solid var(--border); background:var(--card); font-family:inherit; transition:all .15s; }
+  .mode-tab:hover { border-color:var(--accent); color:var(--accent); }
+  .mode-tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* 发音按钮 */
+  .speak-btn { background:none; border:none; color:var(--text2); cursor:pointer; font-size:14px; padding:2px 6px; border-radius:4px; transition:all .15s; margin-left:auto; }
+  .speak-btn:hover { color:var(--accent); background:rgba(88,166,255,0.1); }
+
+  /* 笔记输入 */
+  .note-box { margin-top:10px; }
+  .note-box textarea { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:12px; font-family:inherit; resize:vertical; min-height:50px; outline:none; }
+  .note-box textarea:focus { border-color:var(--accent); }
+  .note-label { font-size:11px; color:var(--text2); margin-bottom:4px; }
+
+  /* 面板容器 */
+  .panel { display:none; }
+  .panel.active { display:block; }
+
+  /* 挑战模式 */
+  .challenge-start { text-align:center; padding:40px 20px; }
+  .challenge-start h3 { font-size:18px; margin-bottom:8px; }
+  .challenge-start p { color:var(--text2); font-size:13px; margin-bottom:20px; }
+  .btn-primary { background:var(--accent); color:#fff; border:none; padding:10px 28px; border-radius:8px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .btn-primary:hover { background:var(--accent2); }
+  .challenge-timer { font-size:13px; color:var(--yellow); font-weight:700; margin-bottom:12px; }
+  .challenge-progress { font-size:12px; color:var(--text2); margin-bottom:16px; }
+  .challenge-question { background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:14px; font-size:14px; font-weight:600; }
+  .challenge-options { display:flex; flex-direction:column; gap:8px; }
+  .challenge-opt { background:var(--card); border:1px solid var(--border); color:var(--text); padding:10px 14px; border-radius:8px; cursor:pointer; font-size:13px; text-align:left; font-family:inherit; transition:all .15s; }
+  .challenge-opt:hover { border-color:var(--accent); background:rgba(88,166,255,0.06); }
+  .challenge-opt.correct { border-color:var(--green) !important; background:rgba(63,185,80,0.12) !important; color:var(--green); }
+  .challenge-opt.wrong { border-color:var(--red) !important; background:rgba(248,81,73,0.12) !important; color:var(--red); }
+  .challenge-result { text-align:center; padding:30px 20px; }
+  .challenge-ring { width:100px; height:100px; border-radius:50%; background:conic-gradient(var(--green) calc(var(--pct)*1%), var(--border) 0); margin:0 auto 16px; display:flex; align-items:center; justify-content:center; position:relative; }
+  .challenge-ring::after { content:attr(data-pct)"%"; width:76px; height:76px; background:var(--card); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; color:var(--text); position:absolute; }
+  .challenge-score { font-size:15px; color:var(--text2); margin-bottom:8px; }
+  .challenge-comment { font-size:20px; font-weight:800; margin-bottom:16px; }
+
+  /* 模拟器 */
+  .sim-scene { background:var(--card2); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:14px; }
+  .sim-scene-title { font-size:13px; color:var(--accent); font-weight:700; margin-bottom:6px; }
+  .sim-scene-text { font-size:14px; font-weight:600; }
+  .sim-input-row { display:flex; gap:8px; margin-bottom:12px; }
+  .sim-input-row input { flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 14px; color:var(--text); font-size:13px; font-family:'SF Mono',monospace; outline:none; }
+  .sim-input-row input:focus { border-color:var(--accent); }
+  .sim-feedback { padding:10px 14px; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:12px; display:none; }
+  .sim-feedback.show { display:block; }
+  .sim-feedback.pass { background:rgba(63,185,80,0.1); border:1px solid rgba(63,185,80,0.2); color:var(--green); }
+  .sim-feedback.fail { background:rgba(248,81,73,0.1); border:1px solid rgba(248,81,73,0.2); color:var(--red); }
+  .sim-hint { font-size:12px; color:var(--text2); margin-bottom:10px; cursor:pointer; }
+  .sim-hint.show { color:var(--yellow); }
+  .sim-progress { font-size:12px; color:var(--text2); margin-bottom:14px; }
+
+  /* 趋势图 */
+  .chart-box { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:20px; margin-top:12px; }
+  .chart-title { font-size:13px; font-weight:700; margin-bottom:16px; }
+  .chart-bars { display:flex; align-items:flex-end; gap:8px; height:160px; padding-bottom:30px; border-bottom:1px solid var(--border); position:relative; }
+  .chart-bar-wrap { flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; height:100%; justify-content:flex-end; }
+  .chart-bar { width:100%; border-radius:4px 4px 0 0; min-height:4px; transition:height .4s ease; position:relative; }
+  .chart-bar.learned { background:var(--green); }
+  .chart-bar.quizzed { background:var(--yellow); }
+  .chart-bar.correct { background:var(--purple); }
+  .chart-bar-label { font-size:10px; color:var(--text2); position:absolute; bottom:-22px; white-space:nowrap; }
+  .chart-legend { display:flex; gap:16px; margin-top:16px; justify-content:center; }
+  .chart-legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text2); }
+  .chart-legend-dot { width:8px; height:8px; border-radius:2px; }
+
+  /* 速查面板 */
+  .cheatsheet { margin-bottom:14px; }
+  .cs-header { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--accent); font-weight:700; cursor:pointer; padding:6px 0; }
+  .cs-body { display:none; flex-wrap:wrap; gap:6px; padding:4px 0 8px; }
+  .cs-body.show { display:flex; }
+  .cs-tag { background:var(--card); border:1px solid var(--border); color:var(--text2); padding:4px 10px; border-radius:6px; font-size:11px; cursor:pointer; transition:all .15s; }
+  .cs-tag:hover { border-color:var(--accent); color:var(--accent); }
+
+  /* 键盘聚焦 */
+  .word-card.focused { border-color:var(--accent); box-shadow:0 0 0 2px rgba(88,166,255,0.15); }
+
+  /* 面板标题 */
+  .panel-title { font-size:18px; font-weight:800; margin-bottom:4px; }
+  .panel-sub { color:var(--text2); font-size:13px; margin-bottom:16px; }
+
+  /* 错题本 */
+  .wrong-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:12px; }
+  .wrong-q { font-size:13px; font-weight:600; margin-bottom:8px; }
+  .wrong-answer { font-size:12px; margin-bottom:4px; }
+  .wrong-answer.wrong-text { color:var(--red); }
+  .wrong-answer.correct-text { color:var(--green); }
+
+  /* 笔记面板 */
+  .note-item { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:10px; }
+  .note-word { font-size:14px; font-weight:700; color:var(--accent); margin-bottom:4px; }
+  .note-content { font-size:12px; color:var(--text2); white-space:pre-wrap; }
+
+  @media (max-width: 800px) {
+    .sidebar { display: none; }
+    .main { margin-left: 0; padding: 20px 16px 60px; }
+    .mode-tabs { gap:2px; }
+    .mode-tab { padding:5px 8px; font-size:11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <h2>⚡ GitHub & Git 词卡 Pro</h2>
+    <div class="sb-sub">完整版 · 共 <span id="totalWords">0</span> 词</div>
+  </div>
+  <div class="cat-label">分类导航</div>
+  <div id="navList"></div>
+  <div class="sidebar-progress">
+    <div class="sp-label">学习进度</div>
+    <div class="sp-bar"><div class="sp-fill" id="sidebarProgress" style="width:0%"></div></div>
+    <div class="sp-num" id="sidebarProgressText">0 / 0 已掌握</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="main-header">
+    <h1 id="pageTitle">📦 全部词汇</h1>
+    <div class="sub" id="pageSub">点击词汇卡片展开详情 + 随堂测验 · 共收录 <span id="headerCount">0</span> 词</div>
+    <div class="stats-row">
+      <div class="stat-card total"><div class="sc-val" id="statTotal">0</div><div class="sc-label">总词汇数</div></div>
+      <div class="stat-card learned"><div class="sc-val" id="statLearned">0</div><div class="sc-label">已掌握</div></div>
+      <div class="stat-card quizzed"><div class="sc-val" id="statQuizzed">0</div><div class="sc-label">已测验</div></div>
+      <div class="stat-card right"><div class="sc-val" id="statRight">0</div><div class="sc-label">测验正确</div></div>
+    </div>
+  </div>
+
+  <!-- 模式Tab -->
+  <div class="mode-tabs" id="modeTabs"></div>
+
+  <!-- 浏览模式面板 -->
+  <div class="panel active" id="browsePanel">
+    <div class="search-box"><span class="si">🔍</span><input type="text" id="searchInput" placeholder="搜索英文或中文释义…（按 / 聚焦）" oninput="doSearch(this.value)"></div>
+    <div class="cheatsheet" id="cheatsheet">
+      <div class="cs-header" onclick="toggleCheatsheet()">🔍 按场景速查命令 <span id="csArrow">▶</span></div>
+      <div class="cs-body" id="csBody">
+        <span class="cs-tag" onclick="cheatSearch('reset revert amend')">我想撤销提交</span>
+        <span class="cs-tag" onclick="cheatSearch('pull fetch')">我想同步远程代码</span>
+        <span class="cs-tag" onclick="cheatSearch('push fork clone')">我想分享代码给别人</span>
+        <span class="cs-tag" onclick="cheatSearch('log show diff blame')">我想查看历史</span>
+        <span class="cs-tag" onclick="cheatSearch('branch merge rebase')">我想管理分支</span>
+        <span class="cs-tag" onclick="cheatSearch('stash')">我想临时保存修改</span>
+      </div>
+    </div>
+    <div class="filter-bar" id="filterBar"></div>
+    <div class="word-list" id="wordList"></div>
+  </div>
+
+  <!-- 每日挑战面板 -->
+  <div class="panel" id="challengePanel">
+    <div class="panel-title">🎯 每日挑战</div>
+    <div class="panel-sub">随机抽取5道题，检验今日学习成果！</div>
+    <div id="challengeStart" class="challenge-start">
+      <h3>准备好了吗？</h3>
+      <p>系统将从110个词汇中随机抽取5道题<br>计时开始，看看你能对几道！</p>
+      <button class="btn-primary" onclick="startChallenge()">开始挑战</button>
+    </div>
+    <div id="challengeArea" style="display:none;">
+      <div class="challenge-timer" id="challengeTimer">⏱ 00:00</div>
+      <div class="challenge-progress" id="challengeProgress"></div>
+      <div class="challenge-question" id="challengeQuestion"></div>
+      <div class="challenge-options" id="challengeOptions"></div>
+    </div>
+    <div id="challengeResult" class="challenge-result" style="display:none;"></div>
+  </div>
+
+  <!-- 命令模拟器面板 -->
+  <div class="panel" id="simulatorPanel">
+    <div class="panel-title">🎮 Git 命令模拟器</div>
+    <div class="panel-sub">根据场景输入对应的 Git 命令，实战演练！</div>
+    <div id="simArea">
+      <div class="sim-progress" id="simProgress"></div>
+      <div class="sim-scene" id="simScene">
+        <div class="sim-scene-title" id="simSceneTitle"></div>
+        <div class="sim-scene-text" id="simSceneText"></div>
+      </div>
+      <div class="sim-hint" id="simHint" onclick="showHint()">💡 点击显示提示</div>
+      <div class="sim-input-row">
+        <input type="text" id="simInput" placeholder="输入 Git 命令..." onkeydown="if(event.key==='Enter')checkSimAnswer()">
+        <button class="btn-primary" onclick="checkSimAnswer()">提交</button>
+      </div>
+      <div class="sim-feedback" id="simFeedback"></div>
+      <div style="text-align:center;">
+        <button class="btn-primary" id="simNextBtn" onclick="nextSimScene()" style="display:none;">下一题</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 错题本面板 -->
+  <div class="panel" id="wrongPanel">
+    <div class="panel-title">❌ 错题本</div>
+    <div class="panel-sub">记录答错的题目，针对性复习</div>
+    <div id="wrongList"></div>
+    <div style="text-align:center;margin-top:16px;">
+      <button class="btn-primary" id="retestBtn" onclick="retestWrong()" style="display:none;">重新测验</button>
+    </div>
+  </div>
+
+  <!-- 我的笔记面板 -->
+  <div class="panel" id="notesPanel">
+    <div class="panel-title">📝 我的笔记</div>
+    <div class="panel-sub">所有你写过的笔记，随时回顾</div>
+    <div id="notesList"></div>
+  </div>
+
+  <!-- 学习趋势面板 -->
+  <div class="panel" id="trendPanel">
+    <div class="panel-title">📊 学习趋势</div>
+    <div class="panel-sub">最近7天的学习数据</div>
+    <div class="chart-box">
+      <div class="chart-title">最近7天学习统计</div>
+      <div class="chart-bars" id="chartBars"></div>
+      <div class="chart-legend">
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--green)"></div>已掌握</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--yellow)"></div>已测验</div>
+        <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--purple)"></div>正确</div>
+      </div>
+    </div>
+    <div id="trendStats" style="margin-top:16px;font-size:13px;color:var(--text2);"></div>
+  </div>
+
+</div>
+
+<script>
+const WORDS = [
+  { id:'init', en:'Init', phonetic:'/ɪˈnɪt/', pos:'verb', cn:'初始化 — 创建一个新的 Git 仓库', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git init my-project', explain:'在当前目录新建 Git 仓库', output:'Initialized empty Git repository in my-project/.git/'},{cmd:'git init --bare repo.git', explain:'创建裸仓库（用于服务器端）'}],
+    tip:'Init 是 initialize 的缩写。在 Linux 系统中，init 还是系统初始化的进程名。',
+    quiz_q:'git init 的作用是？', quiz_opts:['克隆远程仓库','创建新的本地 Git 仓库','删除 Git 仓库','查看提交日志'], quiz_ans:1 },
+  { id:'clone', en:'Clone', phonetic:'/kloʊn/', pos:'verb', cn:'克隆 — 把远程仓库完整下载到本地', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git clone https://github.com/torvalds/linux.git', explain:'克隆 Linux 内核仓库（示例）'},{cmd:'git clone git@github.com:user/repo.git', explain:'用 SSH 方式克隆，需要提前配置 SSH Key'}],
+    tip:'Clone = 克隆。整个仓库原样复制一份到你的电脑，包括完整的提交历史。',
+    quiz_q:'git clone 的作用是？', quiz_opts:['在本地创建新仓库','把远程仓库完整复制到本地','把本地代码推送到远程','查看仓库状态'], quiz_ans:1 },
+  { id:'add', en:'Add', phonetic:'/æd/', pos:'verb', cn:'添加 — 把文件变更放入暂存区', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git add index.html', explain:'把单个文件加入暂存区'},{cmd:'git add .', explain:'把当前目录所有变更加入暂存区'},{cmd:'git add -p', explain:'交互式暂存，逐段选择要暂存的修改'}],
+    tip:'Add 不是"新增文件"的意思，而是"加入暂存区"。已存在的文件修改后也需要 git add 才能提交。',
+    quiz_q:'git add 的作用是？', quiz_opts:['创建新文件','把变更放入暂存区','提交代码到远程','查看文件差异'], quiz_ans:1 },
+  { id:'commit', en:'Commit', phonetic:'/kəˈmɪt/', pos:'verb / noun', cn:'提交 — 把暂存区的变更保存到版本历史', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git commit -m "fix: 修复登录按钮样式"', explain:'提交变更，-m 后写提交说明', output:'[main a1b2c3d] fix: 修复登录按钮样式\n 1 file changed, 3 insertions(+), 1 deletion(-)'},{cmd:'git commit --amend', explain:'修改最后一次提交（常用于改提交信息）'}],
+    tip:'Commit 原意"承诺"，在 Git 里就是"我承诺这些改动没问题"。每次 commit 像给代码拍了快照。',
+    quiz_q:'正确的提交命令是？', quiz_opts:['git save -m "msg"','git push -m "msg"','git commit -m "msg"','git upload -m "msg"'], quiz_ans:2 },
+  { id:'push', en:'Push', phonetic:'/pʊʃ/', pos:'verb', cn:'推送 — 把本地提交上传到远程仓库', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git push origin main', explain:'推送本地 main 分支到远程 origin'},{cmd:'git push -u origin feature-login', explain:'首次推送新分支，-u 设置上游跟踪', output:"Branch 'feature-login' set up to track remote branch."},{cmd:'git push origin --delete feature-login', explain:'删除远程的 feature-login 分支'}],
+    tip:'Push = 推。反义词是 Pull（拉）。Push = 上传，Pull = 下载。记住这个就够了。',
+    quiz_q:'git push 的作用是？', quiz_opts:['从远程拉取最新代码','把本地提交推送到远程仓库','删除远程分支','在本地创建新提交'], quiz_ans:1 },
+  { id:'pull', en:'Pull', phonetic:'/pʊl/', pos:'verb', cn:'拉取 — 从远程仓库下载最新代码并合并', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git pull origin main', explain:'从远程 origin 拉取 main 分支最新代码并合并'},{cmd:'git pull --rebase', explain:'用 rebase 方式拉取，让提交历史更整洁'}],
+    tip:'Pull = 拉，等于 git fetch + git merge 两步合一。每天早上开工前先 git pull，保证本地最新。',
+    quiz_q:'git pull 相当于哪两个命令的组合？', quiz_opts:['git add + git commit','git fetch + git merge','git clone + git push','git init + git remote'], quiz_ans:1 },
+  { id:'fetch', en:'Fetch', phonetic:'/fetʃ/', pos:'verb', cn:'获取 — 从远程下载最新数据，但不自动合并', cat:'基础操作', difficulty:'进阶',
+    demos:[{cmd:'git fetch origin', explain:'获取 origin 的最新数据（不合并）'},{cmd:'git fetch --all', explain:'获取所有远程仓库的最新数据'}],
+    tip:'Fetch 比 Pull 安全——只下载数据不自动合并，让你先看看别人提交了什么，再决定怎么合并。',
+    quiz_q:'git fetch 和 git pull 的主要区别是？', quiz_opts:['fetch 会删除远程分支','fetch 只下载不自动合并','fetch 只能用于本地仓库','fetch 和 pull 完全一样'], quiz_ans:1 },
+  { id:'status', en:'Status', phonetic:'/ˈsteɪtəs/', pos:'noun / verb', cn:'状态 — 查看工作区、暂存区和分支的当前状态', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git status', explain:'查看当前仓库状态', output:'On branch main\nChanges to be committed:\n  (use "git restore --staged <file>..." to unstage)\n\tmodified:   index.html'},{cmd:'git status -s', explain:'简短格式输出（s = short）'}],
+    tip:'不知道现在仓库啥情况？敲 git status 就对了。它会告诉你哪些文件改了、哪些暂存了、当前在哪个分支。',
+    quiz_q:'git status 的作用是？', quiz_opts:['查看提交日志','查看当前仓库状态','推送代码到远程','合并分支'], quiz_ans:1 },
+  { id:'log', en:'Log', phonetic:'/lɔːɡ/', pos:'noun / verb', cn:'日志 — 查看提交历史记录', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git log', explain:'查看提交历史（按时间倒序）'},{cmd:'git log --oneline', explain:'简洁的一行格式，超常用'},{cmd:'git log --graph --oneline --all', explain:'图形化展示所有分支的提交历史'}],
+    tip:'git log --oneline --graph 是看分支历史最爽的命令。图形化的"树枝"一目了然。',
+    quiz_q:'git log --oneline 的作用是什么？', quiz_opts:['删除提交历史','以一行格式显示提交历史','创建新的提交','查看当前状态'], quiz_ans:1 },
+  { id:'diff', en:'Diff', phonetic:'/dɪf/', pos:'noun / verb', cn:'差异 — 查看文件或提交之间的代码变化', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git diff', explain:'查看工作区与暂存区的差异'},{cmd:'git diff --staged', explain:'查看暂存区与最新提交的差异'},{cmd:'git diff main..feature-x', explain:'查看 main 和 feature-x 分支的差异'}],
+    tip:'Diff = difference（差异）。Git 用 + 号表示新增行，- 号表示删除行。看懂 diff 是代码审查基本功。',
+    quiz_q:'git diff 的主要作用是？', quiz_opts:['删除文件','查看代码差异','合并分支','创建新分支'], quiz_ans:1 },
+  { id:'show', en:'Show', phonetic:'/ʃoʊ/', pos:'verb', cn:'展示 — 查看某个提交或对象的详细信息', cat:'基础操作', difficulty:'入门',
+    demos:[{cmd:'git show a1b2c3d', explain:'查看指定提交的详细信息和变更'},{cmd:'git show HEAD', explain:'查看最新一次提交的详情'},{cmd:'git show HEAD:README.md', explain:'查看某次提交时 README.md 的内容'}],
+    tip:'git show = git log + git diff 的结合体。既看提交信息，又看具体改了什么，一个命令搞定。',
+    quiz_q:'git show HEAD 查看的是什么？', quiz_opts:['HEAD 文件的二进制内容','最新一次提交的详情','远程仓库的状态','所有分支列表'], quiz_ans:1 },
+
+  { id:'branch', en:'Branch', phonetic:'/brɑːntʃ/', pos:'noun / verb', cn:'分支 — 从主线上分出的独立开发线', cat:'分支管理', difficulty:'入门',
+    demos:[{cmd:'git branch feature-login', explain:'创建名为 feature-login 的新分支'},{cmd:'git checkout -b feature-login', explain:'创建并立即切换（最常用）'},{cmd:'git branch -a', explain:'查看所有分支（本地+远程）', output:'  main\n* feature-login\n  remotes/origin/main'}],
+    tip:'Branch 就是树枝。命名惯例：feature/xxx、fix/xxx、hotfix/xxx、release/xxx。',
+    quiz_q:'使用 Branch 最核心的目的是？', quiz_opts:['隔离开发，不影响主线代码','加快代码运行速度','减少文件占用空间','让 GitHub 界面更好看'], quiz_ans:0 },
+  { id:'checkout', en:'Checkout', phonetic:'/ˈtʃekaʊt/', pos:'verb', cn:'切换 — 切换到指定分支或恢复文件', cat:'分支管理', difficulty:'入门',
+    demos:[{cmd:'git checkout main', explain:'切换到 main 分支'},{cmd:'git checkout -- index.html', explain:'丢弃对 index.html 的本地修改（危险！）'}],
+    tip:'Git 2.23+ 推荐用 git switch 切换分支、git restore 恢复文件，更语义化。但 checkout 仍然最常用。',
+    quiz_q:'git checkout feature-x 的作用是？', quiz_opts:['删除 feature-x 分支','创建 feature-x 分支','切换到 feature-x 分支','把 feature-x 合并到当前分支'], quiz_ans:2 },
+  { id:'switch', en:'Switch', phonetic:'/ˈswɪtʃ/', pos:'verb', cn:'切换 — git checkout 的语义化替代命令（Git 2.23+）', cat:'分支管理', difficulty:'入门',
+    demos:[{cmd:'git switch main', explain:'切换到 main 分支'},{cmd:'git switch -c feature-login', explain:'创建并切换到新分支（-c = create）'}],
+    tip:'Switch 比 checkout 语义更清晰——switch 只用于切换分支，不会意外地恢复文件。新用户推荐直接用 switch。',
+    quiz_q:'git switch -c new-branch 的作用是什么？', quiz_opts:['删除 new-branch','创建并切换到 new-branch','合并 new-branch','重命名 new-branch'], quiz_ans:1 },
+  { id:'merge', en:'Merge', phonetic:'/mɜːdʒ/', pos:'verb / noun', cn:'合并 — 把分支的代码变更合到当前分支', cat:'分支管理', difficulty:'入门',
+    demos:[{cmd:'git checkout main', explain:'先切回主线'},{cmd:'git merge feature-login', explain:'把 feature-login 合并进 main', output:'Merge made by the \'ort\' strategy.\n feature-login.py | 42 +++++++++\n 1 file changed, 42 insertions(+'},{cmd:'git merge --no-ff feature-login', explain:'禁用快进合并，强制创建合并提交'}],
+    tip:'在 GitHub 上更常用 Pull Request（PR）做合并——网页点按钮，还能让队友 review 代码。',
+    quiz_q:'Merge 和 Branch 的关系，最准确的理解是？', quiz_opts:['Merge 创建分支，Branch 删除分支','它们是同一个操作','必须先 Merge 才能 Branch','Branch 分出去开发，Merge 合回来'], quiz_ans:3 },
+  { id:'rebase', en:'Rebase', phonetic:'/ˈriːbeɪs/', pos:'verb', cn:'变基 — 把当前分支提交"移动"到目标分支最新提交之后', cat:'分支管理', difficulty:'进阶',
+    demos:[{cmd:'git checkout feature-x', explain:'确保在要 rebase 的分支上'},{cmd:'git rebase main', explain:'把 feature-x 的提交重新播放到 main 最新提交后', output:'Successfully rebased and updated refs/heads/feature-x.'}],
+    tip:'Rebase 让提交历史变成直线，比 merge 更整洁。不要 rebase 已推送到远程的提交！',
+    quiz_q:'关于 rebase，以下说法正确的是？', quiz_opts:['rebase 会创建 .merge 文件','rebase 可以改变提交历史','rebase 和 merge 完全一样','rebase 只能用于远程分支'], quiz_ans:1 },
+  { id:'cherry-pick', en:'Cherry-pick', phonetic:'/ˈtʃeri pɪk/', pos:'verb', cn:'遴选 — 把某个特定提交从其他分支"摘"到当前分支', cat:'分支管理', difficulty:'进阶',
+    demos:[{cmd:'git cherry-pick a1b2c3d', explain:'把指定提交（a1b2c3d）的内容合并到当前分支'},{cmd:'git cherry-pick a1b2c3d..e4f5g6h', explain:'遴选一个范围内的多个提交'}],
+    tip:'Cherry = 樱桃，Pick = 摘。就像从果树上摘一颗特定的樱桃，只拿这一个提交，不合并整个分支。',
+    quiz_q:'git cherry-pick 的作用是什么？', quiz_opts:['删除某个提交','把特定提交的内容合并到当前分支','创建新分支','查看提交历史'], quiz_ans:1 },
+  { id:'conflict', en:'Conflict', phonetic:'/ˈkɒnflɪkt/', pos:'noun', cn:'冲突 — 合并时同一处被不同分支修改，Git 无法自动合并', cat:'分支管理', difficulty:'进阶',
+    demos:[{cmd:'git merge feature-x', explain:'合并时出现冲突', output:'CONFLICT (content): Merge conflict in index.html\nAutomatic merge failed; fix conflicts and then commit the result.'},{cmd:'# 手动编辑文件解决冲突后\ngit add index.html\ngit commit', explain:'解决冲突后标记并完成合并'}],
+    tip:'看到 <<<<<<< ======= >>>>>>> 标记别慌，手动编辑保留想要的内容，然后 git add + commit 即可。',
+    quiz_q:'出现 Merge Conflict 时，Git 会在文件中插入什么标记？', quiz_opts:['/* conflict */','<<<<<<< ======= >>>>>>>','--- conflict ---','!!! CONFLICT !!!'], quiz_ans:1 },
+  { id:'fast-forward', en:'Fast-forward', phonetic:'/fɑːst ˈfɔːrwərd/', pos:'noun / adj', cn:'快进合并 — 目标分支没有新提交时，直接移动分支指针的合并方式', cat:'分支管理', difficulty:'进阶',
+    demos:[{cmd:'git merge feature-x', explain:'如果 main 在 feature-x 创建后没有新提交，就是 fast-forward', output:'Updating a1b2c3d..e4f5g6h\nFast-forward'}],
+    tip:'Fast-forward 合并不产生新的合并提交，历史是一条直线。如果不想快进，用 --no-ff 强制创建合并提交。',
+    quiz_q:'Fast-forward 合并的特点是？', quiz_opts:['总是产生新的合并提交','不产生新提交，直接移动指针','会删除被合并的分支','只适用于远程分支'], quiz_ans:1 },
+  { id:'detached', en:'Detached HEAD', phonetic:'/dɪˈtætʃt hed/', pos:'noun', cn:'分离头指针 — HEAD 指向具体提交而非分支', cat:'分支管理', difficulty:'进阶',
+    demos:[{cmd:'git checkout a1b2c3d', explain:'HEAD 指向具体提交，不指向任何分支', output:'Note: switching to \'a1b2c3d\'.\nYou are in \'detached HEAD\' state.'},{cmd:'git switch -', explain:'切回上一个分支，退出 detached HEAD 状态'}],
+    tip:'Detached HEAD 状态下做的提交不属于任何分支，切走就丢了。必须先创建分支再干活！',
+    quiz_q:'Detached HEAD 状态下做的提交，如果不创建新分支会怎样？', quiz_opts:['自动保存到 main 分支','切走后提交会丢失','自动推送到远程','无法做任何修改'], quiz_ans:1 },
+
+  { id:'reset', en:'Reset', phonetic:'/ˈriːset/', pos:'verb', cn:'重置 — 把 HEAD/暂存区/工作区重置到指定状态', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git reset --soft HEAD~1', explain:'撤销最后一次提交，保留变更在暂存区'},{cmd:'git reset --mixed HEAD~1', explain:'撤销提交，保留变更在工作区（默认模式）'},{cmd:'git reset --hard HEAD~1', explain:'强制撤销，丢弃所有变更（不可恢复！）'}],
+    tip:'Soft → Mixed → Hard，一个比一个狠。用前先 git stash 备份！--hard 是核弹级操作。',
+    quiz_q:'git reset --hard 的特点是？', quiz_opts:['保留工作区变更','丢弃所有变更，不可恢复','和 --soft 效果一样','是安全的撤销方式'], quiz_ans:1 },
+  { id:'revert', en:'Revert', phonetic:'/rɪˈvɜːrt/', pos:'verb', cn:'还原 — 用新提交来撤销某个历史提交（安全）', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git revert a1b2c3d', explain:'创建新提交，反向操作 a1b2c3d 的变更', output:'[main e4f5g6h] Revert "fix: 修复登录按钮"\n 1 file changed, 3 deletions(-), 3 insertions(+'},{cmd:'git revert --no-commit HEAD~2..HEAD', explain:'撤销最近两次提交的效果，但不自动提交'}],
+    tip:'Revert vs Reset：Revert 安全（不改历史，适合已推送的提交）；Reset 危险（改写历史，只适合本地）。',
+    quiz_q:'已推送到远程的提交，安全的撤销方式是？', quiz_opts:['git reset --hard','git revert','git remove','git undo'], quiz_ans:1 },
+  { id:'stash', en:'Stash', phonetic:'/stæʃ/', pos:'verb / noun', cn:'储藏 — 临时保存工作区修改，让工作区变干净', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git stash', explain:'把当前未提交的修改储藏起来'},{cmd:'git stash pop', explain:'恢复最近一次储藏并删除记录'},{cmd:'git stash list', explain:'查看所有储藏记录', output:'stash@{0}: WIP on feature-x: a1b2c3d fix login'}],
+    tip:'切换分支前如果有未提交的修改，用 git stash 暂存，切回来后用 git stash pop 恢复。优雅 100 倍。',
+    quiz_q:'切换分支前想保留未提交的修改，应该用？', quiz_opts:['git save','git stash','git backup','git hold'], quiz_ans:1 },
+  { id:'restore', en:'Restore', phonetic:'/rɪˈstɔːr/', pos:'verb', cn:'恢复 — git checkout 的语义化替代，恢复工作区或暂存区文件', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git restore index.html', explain:'丢弃工作区对 index.html 的修改'},{cmd:'git restore --staged index.html', explain:'把暂存区的 index.html 恢复到工作区（取消暂存）'}],
+    tip:'Restore 和 Switch 一样，是 Git 2.23 推出的语义化命令。restore = 恢复文件，switch = 切换分支。',
+    quiz_q:'git restore --staged file.txt 的作用是？', quiz_opts:['删除 file.txt','把 file.txt 从暂存区移回工作区','恢复 file.txt 到最新提交','把 file.txt 推送到远程'], quiz_ans:1 },
+  { id:'clean', en:'Clean', phonetic:'/kliːn/', pos:'verb', cn:'清理 — 删除工作区中未被 Git 跟踪的文件', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git clean -n', explain:'预览将被删除的未跟踪文件（-n = dry run，不真删）'},{cmd:'git clean -fd', explain:'强制删除所有未跟踪的文件和目录（-f = force, -d = directory）'}],
+    tip:'Clean 很猛，直接删文件！先用 -n 预览，确认没问题再用 -fd 执行。被删的文件无法从 Git 恢复。',
+    quiz_q:'git clean -fd 会删除什么文件？', quiz_opts:['已跟踪的文件','已暂存的文件','未被 Git 跟踪的文件','远程仓库的文件'], quiz_ans:2 },
+  { id:'amend', en:'Amend', phonetic:'/əˈmend/', pos:'verb', cn:'修正 — 修改最后一次提交', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git commit --amend -m "新的提交信息"', explain:'修改最后一次提交的说明'},{cmd:'git commit --amend --no-edit', explain:'追加当前暂存区的变更到最后一次提交，不改提交信息'}],
+    tip:'Amend 就是"修正"。提交后发现漏了一个文件？git add 然后 git commit --amend，搞定。已推送的提交不要 amend！',
+    quiz_q:'git commit --amend 的作用是？', quiz_opts:['创建新提交','修改最后一次提交','撤销所有提交','合并两个分支'], quiz_ans:1 },
+  { id:'reflog', en:'Reflog', phonetic:'/ˈreflɔːɡ/', pos:'noun', cn:'引用日志 — Git 的所有操作记录，Git 的"后悔药"', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git reflog', explain:'查看 HEAD 的所有移动记录', output:'a1b2c3d (HEAD -> main) HEAD@{0}: commit: fix login\ne4f5g6h HEAD@{1}: reset: moving to HEAD~1'},{cmd:'git reset --hard HEAD@{2}', explain:'恢复到 reflog 中的某个历史状态'}],
+    tip:'Reflog 是终极后悔药！reset --hard 后丢了提交？reflog 里找回来。reflog 默认保留 90 天。',
+    quiz_q:'git reflog 的主要作用是？', quiz_opts:['查看提交历史','查看 HEAD 的所有移动记录（包括 reset 操作）','删除提交记录','推送到远程'], quiz_ans:1 },
+  { id:'bisect', en:'Bisect', phonetic:'/ˈbaɪsekt/', pos:'verb / noun', cn:'二分查找 — 用二分法定位引入 Bug 的提交', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git bisect start', explain:'启动二分查找'},{cmd:'git bisect bad', explain:'标记当前提交有 Bug'},{cmd:'git bisect good v1.0', explain:'标记 v1.0 标签的提交是好的'}],
+    tip:'Bisect = 二分法。Git 自动帮你"对半砍"提交历史，你只需告诉它"好的"和"坏的"，它就能精准定位。',
+    quiz_q:'git bisect 的作用是什么？', quiz_opts:['合并分支','用二分法定位引入 Bug 的提交','删除历史提交','创建新标签'], quiz_ans:1 },
+  { id:'blame', en:'Blame', phonetic:'/bleɪm/', pos:'verb / noun', cn:'追责 — 逐行显示某文件的修改人、时间和提交', cat:'撤销恢复', difficulty:'进阶',
+    demos:[{cmd:'git blame index.html', explain:'逐行显示 index.html 每行代码是谁写的', output:'a1b2c3d (张三 2023-01-01 10:00:00 +0800 1) <!DOCTYPE html>'},{cmd:'git blame -L 10,20 index.html', explain:'只查看 10-20 行的 blame 信息'}],
+    tip:'Blame = 追责。"这行代码谁写的？"——git blame 告诉你是谁、什么时候、在哪个提交里写的。',
+    quiz_q:'git blame 的主要用途是？', quiz_opts:['删除文件','查看每行代码的作者和提交信息','合并分支','创建新分支'], quiz_ans:1 },
+
+  { id:'remote', en:'Remote', phonetic:'/rɪˈmoʊt/', pos:'noun / adj', cn:'远程 — 指向另一个仓库的引用', cat:'远程协作', difficulty:'入门',
+    demos:[{cmd:'git remote -v', explain:'查看已配置的远程仓库', output:'origin  https://github.com/user/repo.git (fetch)\norigin  https://github.com/user/repo.git (push)'},{cmd:'git remote add upstream https://github.com/original/repo.git', explain:'添加上游仓库（Fork 场景常用）'}],
+    tip:'origin = 克隆时默认的远程仓库名。upstream = Fork 场景下原始项目的仓库。fetch = 拉取权限，push = 推送权限。',
+    quiz_q:'git remote 的作用是？', quiz_opts:['查看和管理远程仓库','删除本地分支','合并分支','查看提交历史'], quiz_ans:0 },
+  { id:'origin', en:'Origin', phonetic:'/ˈɔːrɪdʒɪn/', pos:'noun', cn:'远程别名 — Git 默认给远程仓库起的名字（通常是你克隆来源的仓库）', cat:'远程协作', difficulty:'入门',
+    demos:[{cmd:'git remote -v', explain:'查看所有远程仓库，origin 是默认名称', output:'origin  https://github.com/user/repo.git (fetch)\norigin  https://github.com/user/repo.git (push)'},{cmd:'git push origin main', explain:'推送到名为 origin 的远程仓库的 main 分支'},{cmd:'git remote rename origin github', explain:'把 origin 重命名为 github（名字可以自定义）'}],
+    tip:'Origin 就是"起源"。git clone 时 Git 自动把来源仓库命名为 origin。你可以有多个远程（如 origin + upstream），用 git remote -v 查看。',
+    quiz_q:'origin 在 Git 中通常指的是？', quiz_opts:['GitHub 官网地址','你克隆来源的远程仓库','本地仓库的别名','SSH 密钥'], quiz_ans:1 },
+  { id:'upstream', en:'Upstream', phonetic:'/ˈʌpstriːm/', pos:'noun', cn:'上游 — Fork 场景下，原始开源项目仓库的称谓', cat:'远程协作', difficulty:'进阶',
+    demos:[{cmd:'git remote add upstream https://github.com/original/repo.git', explain:'添加原始仓库为 upstream'},{cmd:'git fetch upstream && git merge upstream/main', explain:'同步原始仓库的最新代码到本地'}],
+    tip:'Fork 后要保持和原项目同步：fetch upstream → merge upstream/main → push 到你的 Fork。',
+    quiz_q:'Fork 场景下，upstream 指的是？', quiz_opts:['你 Fork 出来的仓库','原始的开源项目仓库','你的本地仓库','GitHub 的服务器'], quiz_ans:1 },
+  { id:'downstream', en:'Downstream', phonetic:'/ˈdaʊnstriːm/', pos:'noun', cn:'下游 — 依赖你的项目的其他仓库', cat:'远程协作', difficulty:'进阶',
+    demos:[{cmd:'# 没有专门的 Git 命令，是 GitHub 生态概念', explain:'如果你的项目被其他人 Fork 或使用，他们就是 downstream'},{cmd:'# 典型用法：你维护一个 npm 包，其他人安装使用 = 他们是 downstream', explain:'Downstream 在软件生态中的概念'}],
+    tip:'Upstream 和 Downstream 是上下游关系。上游是你依赖的，下游是依赖你的。一个项目可以同时是上游和下游。',
+    quiz_q:'在开源生态中，downstream 指的是？', quiz_opts:['原始项目仓库','依赖你的项目的其他仓库','GitHub 官方','本地仓库'], quiz_ans:1 },
+  { id:'fork', en:'Fork', phonetic:'/fɔːrk/', pos:'verb / noun', cn:'复刻 — 把别人仓库复制一份到自己的 GitHub 账号下', cat:'远程协作', difficulty:'入门',
+    demos:[{cmd:'# 在 GitHub 网页上点击 Fork 按钮', explain:'Fork 是 GitHub 网页功能，不是 Git 命令'},{cmd:'git clone https://github.com/YOUR-USERNAME/repo.git', explain:'Fork 后克隆你自己的副本到本地修改'}],
+    tip:'Fork 流程：Fork → Clone → 修改 → Push → 提 PR。这是给开源项目贡献代码的标准流程。',
+    quiz_q:'Fork 的主要作用是？', quiz_opts:['删除别人的仓库','把别人仓库复制一份到自己的账号下','合并两个分支','创建新分支'], quiz_ans:1 },
+  { id:'force_push', en:'Force Push', phonetic:'/fɔːrs pʊʃ/', pos:'verb', cn:'强制推送 — 用本地历史覆盖远程历史（危险）', cat:'远程协作', difficulty:'进阶',
+    demos:[{cmd:'git push origin main --force', explain:'强制用本地历史覆盖远程 main 分支'},{cmd:'git push origin main --force-with-lease', explain:'更安全的强制推送（检查远程是否有新提交）'}],
+    tip:'Force push 会改写远程历史，可能把队友的提交搞丢！先用 --force-with-lease，团队协作时最好别用。',
+    quiz_q:'git push --force 的风险是什么？', quiz_opts:['推送到错误的仓库','可能覆盖远程上队友的提交','无法撤销推送','会删除本地文件'], quiz_ans:1 },
+
+  { id:'repository', en:'Repository', phonetic:'/rɪˈzɑːpətɔːri/', pos:'noun', cn:'仓库 — GitHub 上存放项目代码的地方，简称 repo', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'git init my-project', explain:'本地创建新仓库'},{cmd:'git clone https://github.com/user/repo.git', explain:'克隆远程仓库'}],
+    tip:'Repository 简称 repo。GitHub 上每个项目就是一个 repo。public repo = 公开，private repo = 私有。',
+    quiz_q:'Repository 最准确的含义是？', quiz_opts:['一个代码编辑器','存放项目代码的仓库','一个 Git 命令','GitHub 的搜索功能'], quiz_ans:1 },
+  { id:'issue', en:'Issue', phonetic:'/ˈɪʃuː/', pos:'noun', cn:'议题 — GitHub 上跟踪 Bug、任务、功能需求的地方', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在仓库页面点击 Issues → New Issue', explain:'创建新问题/任务'},{cmd:'# 常用标签：bug = 缺陷, enhancement = 功能增强, help wanted = 求助', explain:'给 Issue 打标签分类管理'}],
+    tip:'Issue 不只是 Bug 报告，还可以是功能讨论、任务分配。用 #123 引用编号 123 的 Issue。',
+    quiz_q:'GitHub 上 Issue 的主要作用是？', quiz_opts:['存储代码文件','跟踪 Bug、任务和讨论','合并代码分支','管理团队成员'], quiz_ans:1 },
+  { id:'pull_request', en:'Pull Request', phonetic:'/pʊl rɪˈkwest/', pos:'noun', cn:'拉取请求（PR）— 请求把你的代码变更合并到目标分支', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 GitHub 点击 "New Pull Request"', explain:'PR 是 GitHub 核心协作功能'},{cmd:'# PR 三种结果：Comment = 发表评论, Approve = 批准, Request Changes = 要求修改', explain:'PR 审查流程'}],
+    tip:'PR 是 GitHub 最强功能。提 PR 后队友可 Review 代码、写评论、要求修改，都搞定后点 Merge 合并。',
+    quiz_q:'Pull Request 的主要作用是？', quiz_opts:['删除远程分支','请求别人审查和合并你的代码','下载远程代码到本地','查看提交历史'], quiz_ans:1 },
+  { id:'review', en:'Review', phonetic:'/rɪˈvjuː/', pos:'verb / noun', cn:'审查 — 检查代码变更，提出修改建议', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 PR 页面点击 "Review changes"', explain:'Review 是代码质量保障核心环节'},{cmd:'# Review 要点：逻辑正确性、代码可读性、是否有测试、是否符合规范', explain:'Code Review 关注点'}],
+    tip:'好的 Code Review 不是挑刺，是一起把代码写得更好。审查要点：逻辑、可读性、测试、规范。',
+    quiz_q:'Code Review 中 "Approve" 的含义是？', quiz_opts:['要求修改代码','批准合并','删除 PR','关闭 Issue'], quiz_ans:1 },
+  { id:'star', en:'Star', phonetic:'/stɑːr/', pos:'verb / noun', cn:'星标 — 给喜欢的仓库点亮小星星（收藏/点赞）', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 GitHub 仓库页面点击右上角 ⭐ Star', explain:'Star 表示你关注/喜欢这个仓库'},{cmd:'# 查看自己 Star 的仓库：GitHub 首页 → Stars 标签', explain:'管理你 Star 过的所有仓库'}],
+    tip:'Star = 收藏/点赞。Star 越多说明项目越受欢迎。你的 Stars 列表就是"以后可能会用到的工具清单"。',
+    quiz_q:'GitHub 上 Star 仓库类似于什么操作？', quiz_opts:['克隆仓库到本地','收藏/点赞一个仓库','删除仓库','合并代码'], quiz_ans:1 },
+  { id:'watch', en:'Watch', phonetic:'/wɒtʃ/', pos:'verb / noun', cn:'关注 — 订阅仓库的更新通知', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 GitHub 仓库页面点击 "Watch" 按钮', explain:'选择通知级别：All / Custom / Ignored'},{cmd:'# All = 所有活动通知, Custom = 仅 Issues/PR, Ignored = 不通知', explain:'三种关注级别'}],
+    tip:'Watch 比 Star 更主动——Star 只是标记，Watch 会在仓库有新 Issue/PR/Release 时发通知给你。',
+    quiz_q:'GitHub 上 Watch 和 Star 的区别是？', quiz_opts:['没有区别','Watch 会接收通知，Star 不会','Star 会接收通知，Watch 不会','Watch 会删除仓库'], quiz_ans:1 },
+  { id:'notification', en:'Notification', phonetic:'/ˌnoʊtɪfɪˈkeɪʃn/', pos:'noun', cn:'通知 — GitHub 推送的活动提醒', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 点击右上角铃铛图标查看通知', explain:'GitHub 通知中心'},{cmd:'# 右上角头像 → Settings → Notifications', explain:'自定义通知偏好设置'}],
+    tip:'通知太多了？设置里可以按仓库、按活动类型自定义。把不重要的仓库设为 Ignored，只关注重要的。',
+    quiz_q:'GitHub 通知中心的入口在哪里？', quiz_opts:['仓库首页左上角','页面右上角铃铛图标','个人设置底部','Issue 页面中间'], quiz_ans:1 },
+  { id:'comment', en:'Comment', phonetic:'/ˈkɑːment/', pos:'noun / verb', cn:'评论 — 在 Issue/PR/Commit 上写评论', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 Issue 或 PR 下方写评论', explain:'评论支持 Markdown 格式'},{cmd:'# 在代码行上点击左侧 "+" 号添加行内评论', explain:'行内评论是代码审查的核心'}],
+    tip:'GitHub 评论支持 Markdown，@用户名 可以提到别人，#123 引用 Issue，提交 SHA 可以引用提交。',
+    quiz_q:'在 PR 审查中，点击代码行左侧 "+" 号可以做什么？', quiz_opts:['删除代码','添加行内评论','合并代码','推送到远程'], quiz_ans:1 },
+  { id:'approve', en:'Approve', phonetic:'/əˈpruːv/', pos:'verb', cn:'批准 — PR 审查中同意合并代码', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 PR Review 页面选择 "Approve"', explain:'表示代码审查通过，可以合并'},{cmd:'# 可设置 "Require approval" 规则，要求至少 N 人批准才能合并', explain:'分支保护规则'}],
+    tip:'Approve 是 PR 审查的最终绿灯。很多项目要求至少 1-2 人 Approve 才能合并到主分支。',
+    quiz_q:'PR 审查中 "Approve" 表示什么意思？', quiz_opts:['要求修改代码','批准合并','关闭 PR','删除代码'], quiz_ans:1 },
+  { id:'request_changes', en:'Request Changes', phonetic:'/rɪˈkwest ˈtʃeɪndʒɪz/', pos:'phrase', cn:'要求修改 — PR 审查中提出修改意见', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 在 PR Review 页面选择 "Request changes"', explain:'提交审查意见，需要作者修改后才能合并'},{cmd:'# 作者修改后重新提交，审查者再次 Review', explain:'迭代式代码审查流程'}],
+    tip:'Request Changes 比单纯的 Comment 更强——它会阻止 PR 被合并，直到作者修改并重新请求审查。',
+    quiz_q:'PR 审查中选择 "Request changes" 的效果是什么？', quiz_opts:['立即合并代码','阻止合并，要求作者修改后重新审查','删除 PR','关闭 Issue'], quiz_ans:1 },
+  { id:'close', en:'Close / Reopen', phonetic:'/kloʊz/ /riːˈoʊpən/', pos:'verb', cn:'关闭 / 重新打开 — 关闭或重新打开 Issue/PR', cat:'GitHub 核心', difficulty:'入门',
+    demos:[{cmd:'# 点击 Issue/PR 页面右侧 "Close issue"', explain:'关闭已解决的 Issue 或不需要的 PR'},{cmd:'# 关闭后仍可点击 "Reopen" 重新打开', explain:'误关或问题重现时可以重新打开'},{cmd:'# 在 PR 描述里写 "fixes #123"', explain:'合并 PR 时自动关闭 #123 号 Issue'}],
+    tip:'在提交信息或 PR 描述里写 fixes #123 / closes #456，合并时 GitHub 会自动关闭对应的 Issue。',
+    quiz_q:'在 PR 描述中写 "fixes #123" 有什么效果？', quiz_opts:['创建 #123 号 Issue','合并时自动关闭 #123 号 Issue','删除 #123 号提交','标记 #123 为重要'], quiz_ans:1 },
+
+  { id:'action', en:'Action', phonetic:'/ˈækʃn/', pos:'noun', cn:'动作/自动化 — GitHub Actions 的自动化工作单元', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'# .github/workflows/ci.yml\nname: CI\non: [push, pull_request]\njobs:\n  test:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/checkout@v4\n      - run: npm test', explain:'GitHub Actions 配置文件（放在 .github/workflows/ 目录）'}],
+    tip:'GitHub Actions = 免费的 CI/CD 工具。每次 push/PR 自动跑测试、构建、部署，完全免费！',
+    quiz_q:'GitHub Actions 是什么？', quiz_opts:['一个代码编辑器','GitHub 内置的 CI/CD 自动化工具','Git 命令','代码审查工具'], quiz_ans:1 },
+  { id:'workflow', en:'Workflow', phonetic:'/ˈwɜːrkfloʊ/', pos:'noun', cn:'工作流 — 自动化任务的完整流程定义', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'# GitHub Flow 最简流程：1.从 main 创建分支 2.提交修改 3.提 PR 4.Review + 合并', explain:'最推荐初学者使用的 Git 工作流'},{cmd:'# Git Flow：main + develop + feature + release + hotfix', explain:'更严格的分支模型，适合大型项目'}],
+    tip:'GitHub Flow 最简：main 始终保持可发布状态，所有开发在功能分支完成，通过 PR 合并。',
+    quiz_q:'最适合初学者的 Git 工作流是？', quiz_opts:['Git Flow','GitHub Flow','SVN Flow','Centralized Workflow'], quiz_ans:1 },
+  { id:'runner', en:'Runner', phonetic:'/ˈrʌnər/', pos:'noun', cn:'运行器 — 执行 GitHub Actions 任务的虚拟机', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'# GitHub 提供的免费 runners：ubuntu-latest / windows-latest / macos-latest', explain:'默认的 GitHub 托管运行器'},{cmd:'runs-on: self-hosted', explain:'使用自己配置的服务器作为 runner'}],
+    tip:'Runner 就是跑你自动化脚本的机器。GitHub 免费提供 Linux/Windows/Mac 运行器，也可以用自己的服务器。',
+    quiz_q:'GitHub Actions 中 runner 的作用是？', quiz_opts:['审核代码','执行自动化任务的机器','推送代码到远程','管理 Issue'], quiz_ans:1 },
+  { id:'job', en:'Job', phonetic:'/dʒɒb/', pos:'noun', cn:'任务 — Workflow 中的单个执行单元', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'# 一个 workflow 可以包含多个 job\njobs:\n  build:\n    runs-on: ubuntu-latest\n    steps: [...]\n  test:\n    runs-on: ubuntu-latest\n    steps: [...]', explain:'build 和 test 两个并行 job'},{cmd:'# job 之间可以设置依赖\n  test:\n    needs: build', explain:'test job 等 build 完成后再执行'}],
+    tip:'一个 Workflow 里可以有多个 Job，默认并行执行。用 needs 设置依赖关系，让 job 串行。',
+    quiz_q:'GitHub Actions 中，一个 workflow 里的多个 job 默认是？', quiz_opts:['串行执行','并行执行','随机执行','不执行'], quiz_ans:1 },
+  { id:'step', en:'Step', phonetic:'/step/', pos:'noun', cn:'步骤 — Job 中的单个执行步骤', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'jobs:\n  test:\n    steps:\n      - uses: actions/checkout@v4\n      - name: Install dependencies\n        run: npm ci\n      - name: Run tests\n        run: npm test', explain:'一个 job 由多个 step 组成，串行执行'}],
+    tip:'Step = 步骤。Job 里的 step 是串行的（一步一步来），一个 step 失败整个 job 就失败。',
+    quiz_q:'GitHub Actions 中，job 内的多个 step 默认是？', quiz_opts:['并行执行','串行执行','随机执行','不执行'], quiz_ans:1 },
+  { id:'artifact', en:'Artifact', phonetic:'/ˈɑːrtɪfækt/', pos:'noun', cn:'产物 — Workflow 执行过程中生成的文件或数据', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'- name: Upload artifact\n  uses: actions/upload-artifact@v3\n  with:\n    name: build-output\n    path: dist/', explain:'把构建产物上传到 GitHub 供下载'},{cmd:'- uses: actions/download-artifact@v3\n  with:\n    name: build-output', explain:'在后续 job 中下载之前上传的产物'}],
+    tip:'Artifact = 产物/制品。构建好的可执行文件、测试报告、日志等都可以作为 artifact 上传保存。',
+    quiz_q:'GitHub Actions 中 artifact 的作用是？', quiz_opts:['删除文件','保存和传递构建产物','发送邮件通知','部署到服务器'], quiz_ans:1 },
+  { id:'deploy', en:'Deploy', phonetic:'/dɪˈplɔɪ/', pos:'verb / noun', cn:'部署 — 把代码发布到生产环境或服务器', cat:'GitHub 自动化', difficulty:'进阶',
+    demos:[{cmd:'- name: Deploy to Vercel\n  uses: amondnet/vercel-action@v25\n  with:\n    vercel-token: ${{ secrets.VERCEL_TOKEN }}', explain:'用 GitHub Actions 自动部署到 Vercel'},{cmd:'# GitHub Pages 自动部署\n# 设置仓库 Settings → Pages → Source = GitHub Actions', explain:'GitHub 自带的 Pages 自动部署'}],
+    tip:'Deploy = 部署。把代码从仓库发布到服务器，让用户可以访问。GitHub Actions 可以实现 push 代码后自动部署。',
+    quiz_q:'Deploy 的含义是？', quiz_opts:['删除代码','把代码发布到生产环境','创建新分支','合并代码'], quiz_ans:1 },
+
+  { id:'release', en:'Release', phonetic:'/rɪˈliːs/', pos:'verb / noun', cn:'发布 — GitHub 上的软件版本发布', cat:'版本发布', difficulty:'入门',
+    demos:[{cmd:'# 在 GitHub 仓库页面点击 "Create a new release"', explain:'创建新版本发布'},{cmd:'# Release 包含：1.Git tag（版本号）2.标题和说明 3.附件文件（二进制包）', explain:'Release 的组成部分'}],
+    tip:'Release = 正式版发布。和 tag 不同，Release 有标题、说明文字，还可以上传编译好的二进制文件供下载。',
+    quiz_q:'GitHub Release 和 Git Tag 的主要区别是？', quiz_opts:['没有区别','Release 有标题、说明和附件，Tag 只是标记提交','Tag 更复杂','Release 不能删除'], quiz_ans:1 },
+  { id:'tag', en:'Tag', phonetic:'/tæɡ/', pos:'noun / verb', cn:'标签 — 给某个提交打上有意义的标记（常用于版本号）', cat:'版本发布', difficulty:'入门',
+    demos:[{cmd:'git tag v1.0.0', explain:'给当前提交打 v1.0.0 标签'},{cmd:'git tag -a v1.0.0 -m "第一个正式版本"', explain:'创建带注释的标签（推荐）'},{cmd:'git push origin --tags', explain:'推送本地标签到远程'}],
+    tip:'Tag 常用于标记版本：v1.0.0、v2.1.3。轻量标签 vs 注释标签：推荐用注释标签，包含作者和说明。',
+    quiz_q:'Git 中 Tag 最常见的用途是？', quiz_opts:['标记 Bug 位置','标记版本发布','删除历史提交','创建新分支'], quiz_ans:1 },
+  { id:'draft', en:'Draft', phonetic:'/drɑːft/', pos:'noun / adj', cn:'草稿 — 未正式发布的内容（Release/PR）', cat:'版本发布', difficulty:'进阶',
+    demos:[{cmd:'# 创建 Release 时勾选 "This is a draft"', explain:'草稿 Release 不会公开显示，可以后续编辑再发布'},{cmd:'# 创建 PR 时也可以选择 Create draft pull request', explain:'草稿 PR，还在完善中，不适合合并'}],
+    tip:'Draft = 草稿。Release 草稿 = 还没准备好发布；PR 草稿 = 还在开发中，先给别人看看。',
+    quiz_q:'GitHub 上 Draft Release 的特点是？', quiz_opts:['会自动推送给所有关注者','不会公开显示，可以后续编辑发布','发布后不能修改','只能由管理员创建'], quiz_ans:1 },
+  { id:'pre_release', en:'Pre-release', phonetic:'/ˈpriː rɪˈliːs/', pos:'noun / adj', cn:'预发布 — 非稳定版本的早期测试版', cat:'版本发布', difficulty:'进阶',
+    demos:[{cmd:'# 创建 Release 时勾选 "Set as a pre-release"', explain:'标记为预发布版本（如 alpha、beta、rc）'},{cmd:'# 语义化版本示例：1.0.0-alpha.1 / 1.0.0-beta.2 / 1.0.0-rc.1', explain:'预发布版本号命名'}],
+    tip:'Pre-release = 预发布。给用户试用但明确说明"还不是稳定版"。用户不会收到 pre-release 的自动更新通知。',
+    quiz_q:'Pre-release 的含义是？', quiz_opts:['正式稳定版本','非稳定的早期测试版','已废弃的旧版本','内部测试版本'], quiz_ans:1 },
+  { id:'changelog', en:'Changelog', phonetic:'/ˈtʃeɪndʒlɔːɡ/', pos:'noun', cn:'变更日志 — 记录每个版本更新内容的文档', cat:'版本发布', difficulty:'进阶',
+    demos:[{cmd:'# 常见的 CHANGELOG.md 格式：\n## [1.2.0] - 2024-01-15\n### Added\n- 新增暗黑模式\n### Fixed\n- 修复登录崩溃', explain:'Keep a Changelog 标准格式'}],
+    tip:'Changelog = 变更日志。一个好的 CHANGELOG 让用户一眼看出新版本改了什么、新增了什么、修复了什么。',
+    quiz_q:'CHANGELOG.md 文件的作用是？', quiz_opts:['记录代码作者信息','记录每个版本的更新内容','记录 Git 命令用法','记录团队成员信息'], quiz_ans:1 },
+  { id:'semver', en:'SemVer', phonetic:'/ˈsemvɜːr/', pos:'noun', cn:'语义化版本 — 版本号格式规范 MAJOR.MINOR.PATCH', cat:'版本发布', difficulty:'进阶',
+    demos:[{cmd:'# 语义化版本规则：\n# MAJOR.升级 = 不兼容的 API 变更\n# MINOR.升级 = 向下兼容的新功能\n# PATCH.升级 = 向下兼容的问题修复', explain:'SemVer 版本号递增规则'}],
+    tip:'SemVer = Semantic Versioning。1.2.3：1 是主版本（不兼容变更），2 是次版本（新功能），3 是补丁（Bug 修复）。',
+    quiz_q:'在 SemVer 中，从 1.2.3 升级到 2.0.0 表示什么？', quiz_opts:['修复了 Bug','新增了下兼容功能','有不兼容的 API 变更','只是重新编译'], quiz_ans:2 },
+
+  { id:'milestone', en:'Milestone', phonetic:'/ˈmaɪlstoʊn/', pos:'noun', cn:'里程碑 — 按时间或版本组织 Issue/PR 的集合', cat:'GitHub 项目管理', difficulty:'进阶',
+    demos:[{cmd:'# 在仓库 Issues → Milestones 创建', explain:'比如 "v1.0 发布"、"Q4 迭代"'},{cmd:'# 创建 Milestone 后，把 Issue/PR 关联到它', explain:'方便跟踪进度："v1.0 里程碑：15/20 完成"'}],
+    tip:'Milestone = 里程碑。把相关的 Issue/PR 归到一个里程碑下，像"v1.0 发布"，直观看到进度百分比。',
+    quiz_q:'GitHub Milestone 的主要作用是？', quiz_opts:['删除 Issue','按时间/版本组织 Issue 和 PR','合并分支','部署代码'], quiz_ans:1 },
+  { id:'label', en:'Label', phonetic:'/ˈleɪbl/', pos:'noun / verb', cn:'标签 — 给 Issue/PR 打上的分类标记', cat:'GitHub 项目管理', difficulty:'入门',
+    demos:[{cmd:'# 常用标签：bug（红色）/ enhancement（蓝色）/ documentation（绿色）/ good first issue（紫色）', explain:'给 Issue/PR 打标签分类'}],
+    tip:'Label = 标签。Bug 用红色，新功能用蓝色，好上手的新手任务用 "good first issue"。颜色编码让管理一目了然。',
+    quiz_q:'"good first issue" 标签通常用于？', quiz_opts:['标记严重 Bug','标记适合新手参与的任务','标记已完成的功能','标记废弃代码'], quiz_ans:1 },
+  { id:'assign', en:'Assign', phonetic:'/əˈsaɪn/', pos:'verb', cn:'分配 — 把 Issue/PR 指派给某个人负责', cat:'GitHub 项目管理', difficulty:'入门',
+    demos:[{cmd:'# 在 Issue/PR 右侧 Assignees 点击 assign yourself', explain:'把任务指派给自己或团队成员'},{cmd:'# 一个 Issue 可以分配给多个人', explain:'多人协作时都可以收到通知'}],
+    tip:'Assign = 分配。谁负责解决这个 Issue？assign 给他。被指派人会在通知中心收到提醒。',
+    quiz_q:'GitHub 上 Assign 一个 Issue 给某人的效果是？', quiz_opts:['删除该 Issue','该人会收到通知，知道要负责处理','自动合并代码','锁定该 Issue'], quiz_ans:1 },
+  { id:'project', en:'Project', phonetic:'/ˈprɑːdʒekt/', pos:'noun', cn:'项目板 — GitHub 的看板（Kanban）式任务管理', cat:'GitHub 项目管理', difficulty:'进阶',
+    demos:[{cmd:'# 在仓库或组织页面点击 Projects 标签', explain:'创建看板，列如：To Do / In Progress / Done'},{cmd:'# 可以把 Issue/PR 卡片拖放到不同列', explain:'可视化管理任务进度'}],
+    tip:'Project = 项目板。类似 Trello 的看板，列可以是 "待办/进行中/已完成"，Issue/PR 作为卡片拖来拖去。',
+    quiz_q:'GitHub Project 的功能类似于？', quiz_opts:['代码编辑器','看板式任务管理（如 Trello）','CI/CD 工具','邮件系统'], quiz_ans:1 },
+  { id:'wiki', en:'Wiki', phonetic:'/ˈwɪki/', pos:'noun', cn:'维基 — GitHub 仓库内置的文档网站', cat:'GitHub 项目管理', difficulty:'入门',
+    demos:[{cmd:'# 在仓库页面点击 Wiki 标签', explain:'可以直接在网页上编辑文档'},{cmd:'# Wiki 也是 Git 仓库，可以 clone 到本地编辑', explain:'git clone https://github.com/user/repo.wiki.git'}],
+    tip:'Wiki = 维基百科那种文档。不用单独搭建文档网站，直接在 GitHub 上写。适合 API 文档、使用手册。',
+    quiz_q:'GitHub Wiki 适合做什么？', quiz_opts:['存储代码','写项目文档和使用手册','运行 CI/CD','管理分支'], quiz_ans:1 },
+  { id:'gist', en:'Gist', phonetic:'/dʒɪst/', pos:'noun', cn:'代码片段 — GitHub 的轻量级代码分享工具', cat:'GitHub 项目管理', difficulty:'入门',
+    demos:[{cmd:'# 访问 gist.github.com 创建', explain:'分享单段代码、配置文件、脚本等'},{cmd:'# Gist 支持 Secret（不公开）和 Public（公开）', explain:'Secret Gist 不会出现在搜索结果中'}],
+    tip:'Gist = 代码片段。不用创建完整仓库，快速分享一段代码或配置。还能嵌入到网页里显示。',
+    quiz_q:'GitHub Gist 适合分享什么？', quiz_opts:['完整的项目代码','单段代码片段或配置文件','大型数据库','视频文件'], quiz_ans:1 },
+  { id:'discussion', en:'Discussion', phonetic:'/dɪˈskʌʃn/', pos:'noun', cn:'讨论 — GitHub 上的社区讨论区', cat:'GitHub 项目管理', difficulty:'进阶',
+    demos:[{cmd:'# 在仓库页面点击 Discussions 标签', explain:'适合开放式讨论，不像 Issue 那么正式'},{cmd:'# 可以设置分类：Q&A、Ideas、Show and tell 等', explain:'Discussions 分类管理'}],
+    tip:'Discussion vs Issue：Issue 是"需要解决的问题"，Discussion 是"开放的讨论"。提问去 Discussion，Bug 去 Issue。',
+    quiz_q:'GitHub Discussion 和 Issue 的主要区别是？', quiz_opts:['没有区别','Discussion 用于开放讨论，Issue 用于跟踪具体问题','Discussion 只能管理员创建','Issue 不能评论'], quiz_ans:1 },
+  { id:'pin', en:'Pin', phonetic:'/pɪn/', pos:'verb', cn:'置顶 — 把 Issue/PR 固定在列表顶部', cat:'GitHub 项目管理', difficulty:'入门',
+    demos:[{cmd:'# 在 Issue/PR 页面右侧点击 "Pin issue"', explain:'把重要 Issue 置顶，方便大家看到'},{cmd:'# 最多可以置顶 3 个 Issue', explain:'置顶数量限制'}],
+    tip:'Pin = 置顶。重要的公告、路线图、贡献指南可以 Pin 住，新访问者一进仓库就能看到。',
+    quiz_q:'GitHub 上 Pin Issue 的作用是？', quiz_opts:['删除 Issue','把 Issue 固定在列表顶部','锁定 Issue 不让评论','标记为已解决'], quiz_ans:1 },
+
+  { id:'head', en:'HEAD', phonetic:'/hed/', pos:'noun', cn:'头指针 — 指向当前所在分支的最新提交', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'cat .git/HEAD', explain:'查看 HEAD 当前指向', output:'ref: refs/heads/main'},{cmd:'git checkout a1b2c3d', explain:'让 HEAD 指向具体提交（进入 detached HEAD 状态）'}],
+    tip:'HEAD = 当前位置。HEAD~1 = 上一个提交，HEAD~2 = 上两个提交。理解 HEAD 是理解 Git 原理的关键。',
+    quiz_q:'Git 中的 HEAD 指的是？', quiz_opts:['远程仓库的别名','当前所在的位置（分支/提交）','一个特殊的分支名','GitHub 的 API 地址'], quiz_ans:1 },
+  { id:'sha', en:'SHA / Hash', phonetic:'/ʃɑː/ /hæʃ/', pos:'noun', cn:'哈希值 — 每个提交的唯一标识符（40 位十六进制字符串）', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'git log --oneline', explain:'短哈希（前 7 位）', output:'a1b2c3d fix login\ne4f5g6h add signup'},{cmd:'git show a1b2c3d', explain:'用完整或短哈希引用某个提交'}],
+    tip:'SHA = Secure Hash Algorithm。每个提交的哈希都是全球唯一的，就像指纹。短哈希（前 7 位）通常就够用了。',
+    quiz_q:'Git 中每个提交的唯一标识符是什么？', quiz_opts:['文件名','SHA 哈希值','作者邮箱','提交时间'], quiz_ans:1 },
+  { id:'tracked', en:'Tracked', phonetic:'/trækt/', pos:'adj', cn:'已跟踪 — Git 正在跟踪的文件', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'git status', explain:'已跟踪文件会显示 modified/staged 状态'},{cmd:'git ls-files', explain:'列出所有已跟踪的文件'}],
+    tip:'Tracked = Git 认识的文件。Untracked = Git 不认识的文件（新文件默认 untracked，需要 git add 变成 tracked）。',
+    quiz_q:'新创建的文件默认是什么状态？', quiz_opts:['已跟踪（tracked）','未跟踪（untracked）','已暂存（staged）','已提交（committed）'], quiz_ans:1 },
+  { id:'untracked', en:'Untracked', phonetic:'/ʌnˈtrækt/', pos:'adj', cn:'未跟踪 — Git 还没有开始跟踪的新文件', cat:'高级概念', difficulty:'入门',
+    demos:[{cmd:'git status', explain:'untracked 文件显示为 "Untracked files"', output:'Untracked files:\n  (use "git add <file>..." to include in what will be committed)\n\tnew-file.txt'},{cmd:'git add new-file.txt', explain:'把 untracked 文件加入跟踪（变成 tracked）'}],
+    tip:'Untracked = 还没被 Git 跟踪的新文件。git add 后变成 tracked。.gitignore 里的文件永远不会变成 untracked（直接被忽略）。',
+    quiz_q:'git add 的主要作用之一是？', quiz_opts:['删除文件','把 untracked 文件变成 tracked','合并分支','推送到远程'], quiz_ans:1 },
+  { id:'staged', en:'Staged', phonetic:'/steɪdʒd/', pos:'adj', cn:'已暂存 — 已加入暂存区、等待提交的变更', cat:'高级概念', difficulty:'入门',
+    demos:[{cmd:'git add index.html', explain:'把 index.html 加入暂存区（变成 staged）'},{cmd:'git status', explain:'staged 的文件显示为 "Changes to be committed"'}],
+    tip:'Staging area = 暂存区 = INDEX。git add 后的文件在这里等待，git commit 后正式进入版本历史。',
+    quiz_q:'git add 后，文件处于什么状态？', quiz_opts:['已提交（committed）','已暂存（staged）','已推送（pushed）','已合并（merged）'], quiz_ans:1 },
+  { id:'modified', en:'Modified', phonetic:'/ˈmɑːdɪfaɪd/', pos:'adj', cn:'已修改 — 已跟踪文件在工作区被修改但还没暂存', cat:'高级概念', difficulty:'入门',
+    demos:[{cmd:'git status', explain:'modified 文件显示为 "Changes not staged for commit"'},{cmd:'git diff', explain:'查看 modified 文件的具体变更'}],
+    tip:'Modified = 改过了但还没 git add。Git 三种文件状态：Modified → Staged → Committed（改了 → 暂存了 → 提交了）。',
+    quiz_q:'文件被修改但还没 git add，git status 会显示为什么状态？', quiz_opts:['staged','modified','committed','untracked'], quiz_ans:1 },
+  { id:'index', en:'Index / Staging Area', phonetic:'/ˈɪndeks/ /ˈsteɪdʒɪŋ ˈeriə/', pos:'noun', cn:'索引 / 暂存区 — git add 后文件存放的中间区域', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'git ls-files --stage', explain:'查看暂存区的文件状态', output:'100644 a1b2c3d 0\tindex.html'},{cmd:'# 暂存区在 .git/index 文件中', explain:'这是 Git 的内部实现细节'}],
+    tip:'Index = Staging area = 暂存区。工作区 → 暂存区（git add）→ 仓库（git commit）。三步走。',
+    quiz_q:'git add 把文件放到了哪里？', quiz_opts:['远程仓库','暂存区（Staging Area）','GitHub 服务器','工作区'], quiz_ans:1 },
+  { id:'working_tree', en:'Working Tree', phonetic:'/ˈwɜːrkɪŋ triː/', pos:'noun', cn:'工作区 — 你在编辑器里实际看到和编辑的文件', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'git status', explain:'显示工作区、暂存区和仓库的状态对比'},{cmd:'git diff', explain:'比较工作区和暂存区的差异'}],
+    tip:'Working tree = 工作目录 = 你看到的文件。Working tree → Staging area → Repository，像工厂的三条流水线。',
+    quiz_q:'Git 中 "Working Tree" 指的是？', quiz_opts:['远程仓库','暂存区','你实际编辑的文件目录','Git 的配置文件'], quiz_ans:2 },
+  { id:'bare', en:'Bare Repository', phonetic:'/ber rɪˈzɑːpətri/', pos:'noun', cn:'裸仓库 — 没有工作区的仓库（常用于服务器）', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'git init --bare repo.git', explain:'创建裸仓库'},{cmd:'# 裸仓库目录下没有工作区文件，只有 .git 里的内容', explain:'GitHub 上的仓库本质上就是裸仓库'}],
+    tip:'Bare = 裸的。普通仓库有工作区（你能看到的文件），裸仓库只有 Git 内部数据。服务器上的仓库都是裸的。',
+    quiz_q:'裸仓库（Bare Repository）的特点是？', quiz_opts:['包含完整的工作区文件','没有工作区，只有 Git 内部数据','会自动推送到 GitHub','不能存储提交历史'], quiz_ans:1 },
+  { id:'squash', en:'Squash', phonetic:'/skwɑːʃ/', pos:'verb', cn:'压缩合并 — 把多个提交压缩成一个再合并', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'# 在 GitHub PR 页面选择 "Squash and merge"', explain:'把 PR 里所有提交压缩成一个'},{cmd:'git rebase -i HEAD~3\n# 把 pick 改成 squash', explain:'本地用 rebase 交互模式压缩提交'}],
+    tip:'Squash 让提交历史更整洁。15 个 "fix typo" 提交合并后变成一个干净的提交，main 历史读起来很舒服。',
+    quiz_q:'Squash merge 的主要作用是？', quiz_opts:['把多个提交合并成一个','删除远程分支','加快代码运行速度','创建新标签'], quiz_ans:0 },
+  { id:'hook', en:'Hook', phonetic:'/hʊk/', pos:'noun', cn:'钩子 — Git 在特定事件触发时执行的自定义脚本', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'# .git/hooks/ 目录下有示例钩子\n# pre-commit = 提交前执行\n# post-merge = 合并后执行', explain:'常见的 Git 钩子'},{cmd:'# pre-commit 钩子示例：自动跑代码格式化\nnpx prettier --write .', explain:'提交前自动格式化代码'}],
+    tip:'Hook = 钩子。提交前跑测试、合并后发通知、推送前检查代码规范……自动化全靠钩子。',
+    quiz_q:'Git Hook 的作用是？', quiz_opts:['删除文件','在特定事件时执行自定义脚本','合并分支','创建新仓库'], quiz_ans:1 },
+  { id:'patch', en:'Patch', phonetic:'/pætʃ/', pos:'noun / verb', cn:'补丁 — 包含代码变更的文本文件，用于分享或应用修改', cat:'高级概念', difficulty:'进阶',
+    demos:[{cmd:'git diff > my-changes.patch', explain:'把当前修改导出成 patch 文件'},{cmd:'git apply my-changes.patch', explain:'应用 patch 文件（不打邮箱信息）'},{cmd:'git format-patch main', explain:'生成 patch 文件（包含提交信息，可用于邮件提交）'}],
+    tip:'Patch = 补丁。Linux 内核开发早期就是用邮件发 patch 来提交代码的。现在虽然用 PR 了，但 patch 仍有用（比如跨网络传代码）。',
+    quiz_q:'git format-patch 生成的是什么？', quiz_opts:['压缩包','包含代码变更和提交信息的 patch 文件','可执行文件','日志文件'], quiz_ans:1 },
+
+  { id:'gitignore', en:'.gitignore', phonetic:'/dɔt ɡɪt ɪɡˈnɔːr/', pos:'noun', cn:'忽略文件 — 告诉 Git 哪些文件不需要跟踪', cat:'配置与忽略', difficulty:'入门',
+    demos:[{cmd:'# .gitignore 文件示例\nnode_modules/\n*.log\n.env\n.DS_Store', explain:'忽略 node_modules、日志文件、环境变量等'}],
+    tip:'.gitignore 是必备文件！依赖目录、编译产物、环境变量、系统文件都应该忽略。别往仓库里塞 node_modules！',
+    quiz_q:'.gitignore 文件的作用是什么？', quiz_opts:['删除不需要的文件','告诉 Git 哪些文件不需要跟踪','自动格式化代码','生成文档'], quiz_ans:1 },
+  { id:'gitattributes', en:'.gitattributes', phonetic:'/dɔt ɡɪt ˈætrɪbjuːts/', pos:'noun', cn:'属性文件 — 定义文件的处理方式（换行符、合并策略等）', cat:'配置与忽略', difficulty:'进阶',
+    demos:[{cmd:'# .gitattributes 示例\n*.txt text=auto\n*.jpg binary\n*.sh eol=lf', explain:'定义文本/二进制、换行符格式等'}],
+    tip:'.gitattributes 解决跨平台问题：Windows(CRLF) vs Mac/Linux(LF)。设置 text=auto 让 Git 自动处理换行符。',
+    quiz_q:'.gitattributes 主要用于解决什么问题？', quiz_opts:['文件权限','换行符等跨平台差异','代码风格','编译配置'], quiz_ans:1 },
+  { id:'codeowners', en:'CODEOWNERS', phonetic:'/koʊd ˈoʊnərz/', pos:'noun', cn:'代码所有者 — 定义哪些文件/目录由谁负责审查', cat:'配置与忽略', difficulty:'进阶',
+    demos:[{cmd:'# .github/CODEOWNERS 示例\n*       @team-lead\n*.js    @frontend-team\n*.py    @backend-team', explain:'自动分配 PR 审查人'}],
+    tip:'CODEOWNERS = 代码主人。PR 改动了某个文件，GitHub 自动要求对应 owner 审查。放在 .github/CODEOWNERS。',
+    quiz_q:'CODEOWNERS 文件的作用是？', quiz_opts:['记录代码作者','自动分配 PR 审查责任人','管理文件权限','生成文档'], quiz_ans:1 },
+  { id:'readme', en:'README', phonetic:'/ˈriːdmiː/', pos:'noun', cn:'自述文件 — 项目的说明文档，仓库的"门面"', cat:'配置与忽略', difficulty:'入门',
+    demos:[{cmd:'# README.md 通常包含：1.项目简介 2.安装使用 3.贡献指南 4.许可证', explain:'README 是别人了解项目的第一入口'}],
+    tip:'README = 读我。这是项目的门面，写得好坏直接影响别人愿不愿意用你的项目。用 Markdown 写，GitHub 会自动渲染。',
+    quiz_q:'README.md 的主要作用是？', quiz_opts:['记录代码变更','作为项目的说明文档和门面','管理分支','运行自动化测试'], quiz_ans:1 },
+  { id:'license', en:'License', phonetic:'/ˈlaɪsns/', pos:'noun', cn:'许可证 — 规定别人如何使用你的代码的法律文件', cat:'配置与忽略', difficulty:'入门',
+    demos:[{cmd:'# 常见开源许可证：\n# MIT = 最宽松，只保留版权声明\n# Apache-2.0 = 允许商用，保留专利授权\n# GPL = 要求衍生项目也开源', explain:'GitHub 创建仓库时可选择许可证'}],
+    tip:'License = 许可证。没加 License = 默认版权所有，别人不能合法使用。MIT 最宽松，GPL 最严格。',
+    quiz_q:'没有 License 的代码，别人可以？', quiz_opts:['自由使用修改','默认版权所有，不能合法使用','只能查看不能下载','自动变为开源'], quiz_ans:1 },
+  { id:'markdown', en:'Markdown', phonetic:'/ˈmɑːrkdəʊn/', pos:'noun', cn:'标记语言 — 轻量级标记语言，GitHub 文档的标准格式（.md 文件）', cat:'配置与忽略', difficulty:'入门',
+    demos:[{cmd:'# Markdown 常用语法：\n# # 标题\n# **粗体**\n# *斜体*\n# [链接](URL)\n# ![图片](图片URL)\n# - 列表项', explain:'README.md 就是用 Markdown 写的'},{cmd:'# GitHub 支持 GFM（GitHub Flavored Markdown），额外支持：\n# - 语法高亮代码块\n# - 任务列表 - [x] 已完成\n# - 表格 | 列1 | 列2 |', explain:'GFM 是 GitHub 扩展的 Markdown'}],
+    tip:'Markdown = 标记语言。.md 文件（如 README.md）都用 Markdown 写。学会基础语法，README 写起来飞快。',
+    quiz_q:'GitHub 上 README.md 文件的 .md 后缀代表什么？', quiz_opts:['Media Data','Markdown 格式','Model Definition','Module Directory'], quiz_ans:1 },
+  { id:'config', en:'Config', phonetic:'/ˈkɒnfɪɡ/', pos:'noun / verb', cn:'配置 — 查看或修改 Git 的配置项', cat:'配置与忽略', difficulty:'入门',
+    demos:[{cmd:'git config --global user.name "你的名字"', explain:'设置全局用户名（必须配置）'},{cmd:'git config --global user.email "your@email.com"', explain:'设置全局邮箱（必须配置）'},{cmd:'git config --list', explain:'查看所有 Git 配置', output:'user.name=张三\nuser.email=test@example.com\ncore.editor=vim'}],
+    tip:'Config = 配置。第一次用 Git 必须配置用户名和邮箱，否则无法提交。--global = 全局配置，--local = 仅当前仓库。',
+    quiz_q:'第一次使用 Git 必须配置什么？', quiz_opts:['远程仓库地址','用户名和邮箱','SSH 密钥','分支名称'], quiz_ans:1 },
+
+  { id:'collaborator', en:'Collaborator', phonetic:'/kəˈlæbəreɪtər/', pos:'noun', cn:'协作者 — 被邀请参与项目的团队成员', cat:'权限协作', difficulty:'入门',
+    demos:[{cmd:'# Settings → Manage access → Invite a collaborator', explain:'邀请团队成员协作开发'}],
+    tip:'Collaborator = 协作者。Public 仓库谁都能看，但只有 Collaborator 能直接 push 代码。其他人要通过 Fork + PR 贡献。',
+    quiz_q:'Public 仓库中，谁可以直接 push 代码？', quiz_opts:['任何人','只有 Collaborator 和 Owner','只有 GitHub 员工','只有管理员'], quiz_ans:1 },
+  { id:'permission', en:'Permission', phonetic:'/pərˈmɪʃn/', pos:'noun', cn:'权限 — 用户对仓库的操作权限级别', cat:'权限协作', difficulty:'入门',
+    demos:[{cmd:'# GitHub 权限级别：\n# Read = 只读\n# Triage = 管理 Issue/PR\n# Write = 推送代码\n# Maintain = 管理设置\n# Admin = 完全控制', explain:'五种权限级别'}],
+    tip:'Permission = 权限。Read 最弱，Admin 最强。给团队成员分配合适权限，避免误操作。',
+    quiz_q:'GitHub 仓库的最高权限级别是？', quiz_opts:['Write','Maintain','Admin','Owner'], quiz_ans:2 },
+  { id:'branch_protection', en:'Branch Protection', phonetic:'/brɑːntʃ prəˈtekʃn/', pos:'noun', cn:'分支保护 — 防止主分支被直接推送或误合并', cat:'权限协作', difficulty:'进阶',
+    demos:[{cmd:'# Settings → Branches → Add rule', explain:'设置保护规则：要求 PR、要求审查、要求 CI 通过等'},{cmd:'# 常见保护规则：Require pull request reviews / Require status checks / Restrict pushes', explain:'分支保护常见配置'}],
+    tip:'Branch Protection = 分支保险箱。禁止直接 push 到 main，强制走 PR + Review 流程，防止误操作。',
+    quiz_q:'分支保护规则的主要目的是？', quiz_opts:['加快代码推送','防止误操作，强制走 PR 审查流程','自动删除旧分支','减少仓库大小'], quiz_ans:1 },
+  { id:'status_check', en:'Status Check', phonetic:'/ˈsteɪtəs tʃek/', pos:'noun', cn:'状态检查 — CI 测试/检查通过后才能合并的强制要求', cat:'权限协作', difficulty:'进阶',
+    demos:[{cmd:'# 分支保护中启用 "Require status checks"', explain:'PR 合并前必须通过 CI 测试'},{cmd:'# 常见的 status checks：CI/Build, Lint/Code Quality, Test Coverage', explain:'各种自动化检查'}],
+    tip:'Status Check = 质量门。CI 测试不通过？PR 不让合并。这是保证代码质量的关键防线。',
+    quiz_q:'Status Check 的作用是什么？', quiz_opts:['删除失败的提交','确保 CI 测试通过后才能合并 PR','自动修复代码','发送邮件通知'], quiz_ans:1 },
+  { id:'contributing', en:'CONTRIBUTING', phonetic:'/kənˈtrɪbjuːtɪŋ/', pos:'noun', cn:'贡献指南 — 告诉外部开发者如何给项目贡献代码', cat:'权限协作', difficulty:'进阶',
+    demos:[{cmd:'# CONTRIBUTING.md 通常包含：1.如何提交 Issue 2.代码风格要求 3.PR 流程 4.开发环境搭建', explain:'开源项目的贡献指南'}],
+    tip:'CONTRIBUTING = 贡献指南。写清楚"怎么给这个项目提 PR"，减少沟通成本。放在仓库根目录，GitHub 会自动提示。',
+    quiz_q:'CONTRIBUTING.md 文件的作用是？', quiz_opts:['记录代码变更','指导外部开发者如何贡献代码','管理权限','自动生成文档'], quiz_ans:1 },
+  { id:'template', en:'Template', phonetic:'/ˈtempleɪt/', pos:'noun', cn:'模板 — Issue/PR 的预设格式，规范提交内容', cat:'权限协作', difficulty:'进阶',
+    demos:[{cmd:'# .github/ISSUE_TEMPLATE/bug_report.md', explain:'Bug 报告模板'},{cmd:'# .github/PULL_REQUEST_TEMPLATE.md', explain:'PR 描述模板'}],
+    tip:'Template = 模板。给 Issue/PR 预设格式，别人提问题时自动填充模板，信息更完整、沟通更高效。',
+    quiz_q:'GitHub Issue Template 的作用是？', quiz_opts:['删除 Issue','规范 Issue 提交格式，确保信息完整','自动修复 Bug','发送通知'], quiz_ans:1 },
+
+  { id:'organization', en:'Organization / Org', phonetic:'/ˌɔːrɡənaɪˈzeɪʃn/ /ɔːrdʒ/', pos:'noun', cn:'组织 — GitHub 上的团队/公司账号', cat:'组织管理', difficulty:'入门',
+    demos:[{cmd:'# 创建 Organization：右上角 + → New organization', explain:'团队成员共享的账号，可以统一管理多个仓库'},{cmd:'# Org 可以设置 Team、权限、计费', explain:'适合公司或开源团队使用'}],
+    tip:'Organization = 组织账号。公司/团队用 Org 管理仓库，成员加入 Org 获得相应权限。个人账号适合独立开发者。',
+    quiz_q:'GitHub Organization 适合什么场景？', quiz_opts:['个人博客','公司/团队管理多个仓库','存储图片','临时项目'], quiz_ans:1 },
+  { id:'team', en:'Team', phonetic:'/tiːm/', pos:'noun', cn:'团队 — Organization 内的子团队，方便批量管理权限', cat:'组织管理', difficulty:'进阶',
+    demos:[{cmd:'# Org Settings → Teams → New team', explain:'创建 Frontend Team、Backend Team 等'},{cmd:'# 给 Team 分配仓库权限', explain:'整个 Team 的成员自动获得对应权限'}],
+    tip:'Team = 团队。不用一个个给成员加权限，加到 Team 里，整个 Team 自动获得权限。离职时从 Team 移除即可。',
+    quiz_q:'GitHub Team 的主要优势是？', quiz_opts:['加快代码运行速度','批量管理成员权限','自动修复 Bug','减少仓库大小'], quiz_ans:1 },
+  { id:'admin', en:'Admin', phonetic:'/ˈædmɪn/', pos:'noun', cn:'管理员 — 拥有仓库/组织完全控制权限的人', cat:'组织管理', difficulty:'入门',
+    demos:[{cmd:'# Settings → Manage access', explain:'查看和管理仓库成员权限'}],
+    tip:'Admin = 管理员。能删仓库、改设置、加成员。公司项目 Owner 通常是 Admin，普通开发者给 Write 就够了。',
+    quiz_q:'GitHub 仓库中 Admin 权限可以做什么？', quiz_opts:['只能查看代码','拥有完全控制权限（包括删除仓库）','只能提交 Issue','只能审查代码'], quiz_ans:1 },
+  { id:'maintainer', en:'Maintainer', phonetic:'/meɪnˈteɪnər/', pos:'noun', cn:'维护者 — 负责项目日常维护和代码审查的核心成员', cat:'组织管理', difficulty:'进阶',
+    demos:[{cmd:'# 开源项目中，Maintainer 负责：Review PR、管理 Issue、发布 Release、制定规范', explain:'Maintainer 的职责'}],
+    tip:'Maintainer = 维护者。开源项目的核心贡献者，有合并 PR、管理 Issue 的权限。不是公司职位，是社区认可的角色。',
+    quiz_q:'开源项目中的 Maintainer 主要负责什么？', quiz_opts:['只写代码','Review PR、管理 Issue、维护项目','只测试代码','只写文档'], quiz_ans:1 },
+  { id:'contributor', en:'Contributor', phonetic:'/kənˈtrɪbjuːtər/', pos:'noun', cn:'贡献者 — 给项目提交过代码的任何人', cat:'组织管理', difficulty:'入门',
+    demos:[{cmd:'# 在仓库 Insights → Contributors 查看', explain:'查看所有贡献者的提交统计'},{cmd:'# 开源项目 README 里常写 "Thanks to all contributors!"', explain:'感谢贡献者'}],
+    tip:'Contributor = 贡献者。哪怕只改了一个错别字，你也是 Contributor。GitHub 会自动统计每个人的贡献。',
+    quiz_q:'在 GitHub 上，给项目提交过 PR（哪怕很小）的人叫什么？', quiz_opts:['Owner','Contributor','Viewer','Guest'], quiz_ans:1 },
+
+  { id:'token', en:'Token', phonetic:'/ˈtoʊkən/', pos:'noun', cn:'令牌 — 代替密码进行 API 认证的字符串', cat:'安全认证', difficulty:'入门',
+    demos:[{cmd:'# Settings → Developer settings → Personal access tokens', explain:'创建个人访问令牌'},{cmd:'# 克隆时用 token：\ngit clone https://TOKEN@github.com/user/repo.git', explain:'用 token 代替密码'}],
+    tip:'Token = 令牌。GitHub 已不支持密码直接操作，必须用 Personal Access Token（PAT）或 SSH Key。',
+    quiz_q:'GitHub 上代替密码进行 Git 操作认证的方式是？', quiz_opts:['用户名+密码','Personal Access Token 或 SSH Key','手机号验证码','邮箱验证码'], quiz_ans:1 },
+  { id:'ssh', en:'SSH Key', phonetic:'/ˌes es ˈeɪtʃ kiː/', pos:'noun', cn:'SSH 密钥 — 安全的免密码认证方式', cat:'安全认证', difficulty:'入门',
+    demos:[{cmd:'ssh-keygen -t ed25519 -C "your@email.com"', explain:'生成 SSH 密钥对'},{cmd:'cat ~/.ssh/id_ed25519.pub', explain:'复制公钥到 GitHub Settings → SSH and GPG keys'}],
+    tip:'SSH Key = 免密神器。配置一次，以后 push/pull 再也不用输密码。比 HTTPS + Token 更方便。',
+    quiz_q:'配置 SSH Key 后，Git 操作还需要输入密码吗？', quiz_opts:['每次都要','不需要，免密操作','只在第一次需要','只在 push 时需要'], quiz_ans:1 },
+  { id:'credential', en:'Credential', phonetic:'/krəˈdenʃl/', pos:'noun', cn:'凭据 — 用于认证的账号信息（用户名、密码、token 等）', cat:'安全认证', difficulty:'进阶',
+    demos:[{cmd:'git credential-manager configure', explain:'配置凭据管理器'},{cmd:'git config --global credential.helper cache', explain:'缓存凭据一段时间，避免重复输入'}],
+    tip:'Credential = 凭据。Git 的 credential helper 帮你记住 token，不用每次都输。Mac 用 osxkeychain，Windows 用 Windows Credential Manager。',
+    quiz_q:'git credential.helper 的作用是什么？', quiz_opts:['删除凭据','记住认证信息，避免重复输入','生成随机密码','加密代码'], quiz_ans:1 },
+  { id:'authentication', en:'Authentication', phonetic:'/ɔːˌθentɪˈkeɪʃn/', pos:'noun', cn:'认证 — 验证"你是谁"的过程', cat:'安全认证', difficulty:'进阶',
+    demos:[{cmd:'# GitHub 认证方式：1.HTTPS + PAT 2.SSH Key 3.GitHub CLI', explain:'三种认证方式'}],
+    tip:'Authentication = 认证（你是谁）。Authorization = 授权（你能做什么）。先认证身份，再授权权限。',
+    quiz_q:'Authentication 的含义是？', quiz_opts:['授权你能做什么','验证你是谁','加密数据','删除账号'], quiz_ans:1 },
+  { id:'authorization', en:'Authorization', phonetic:'/ˌɔːθəraɪˈzeɪʃn/', pos:'noun', cn:'授权 — 确定"你能做什么"的权限分配', cat:'安全认证', difficulty:'进阶',
+    demos:[{cmd:'# Token 的授权范围（Scopes）：\n# repo = 访问仓库\n# workflow = 管理 Actions\n# write:packages = 发布包', explain:'给 Token 分配不同权限范围'}],
+    tip:'Authorization = 授权。Authentication 解决"你是谁"，Authorization 解决"你能干什么"。给 Token 最小权限原则。',
+    quiz_q:'Authorization 的含义是？', quiz_opts:['验证你是谁','确定你能做什么','加密数据','删除账号'], quiz_ans:1 },
+
+  { id:'pages', en:'GitHub Pages', phonetic:'/ɡɪthʌb peɪdʒɪz/', pos:'noun', cn:'页面 — GitHub 提供的免费静态网站托管服务', cat:'GitHub Pages', difficulty:'入门',
+    demos:[{cmd:'# 仓库 Settings → Pages → Source', explain:'选择分支和目录作为网站源'},{cmd:'# 支持 Jekyll 静态网站生成器', explain:'用 Jekyll 自动生成博客/文档网站'}],
+    tip:'GitHub Pages = 免费托管静态网站。把 HTML 文件推到仓库，GitHub 自动生成网站 URL。适合个人博客、项目文档。',
+    quiz_q:'GitHub Pages 的主要用途是？', quiz_opts:['运行后端服务器','免费托管静态网站','存储数据库','发送邮件'], quiz_ans:1 },
+
+  { id:'clone_vs_fork', en:'Clone vs Fork', phonetic:'/kloʊn vaɪz fɔːrk/', pos:'phrase', cn:'克隆 vs 复刻 — 两个容易混淆的概念对比', cat:'新手常见问题', difficulty:'入门',
+    demos:[{cmd:'# Clone = 下载到本地\n git clone https://github.com/user/repo.git', explain:'Clone 是把仓库下载到你的电脑'},{cmd:'# Fork = 复制到账号\n # 在 GitHub 网页上点 Fork 按钮', explain:'Fork 是在 GitHub 上复制一份到你的账号'}],
+    tip:'Clone = 下载到本地（你自己的电脑）。Fork = 复制到你的 GitHub 账号（还在 GitHub 上）。新手常混淆这两个概念。简单记：Clone 是"下载"，Fork 是"复制"。',
+    quiz_q:'Fork 操作是在哪里完成的？', quiz_opts:['本地电脑命令行','GitHub 网页上','只能在手机上','通过邮件申请'], quiz_ans:1 },
+  { id:'https_vs_ssh', en:'HTTPS vs SSH', phonetic:'/eɪtʃtɪtiːpiː es es vs es es eɪtʃ/', pos:'phrase', cn:'两种 Git 远程连接协议 — 新手不知道该用哪个', cat:'新手常见问题', difficulty:'入门',
+    demos:[{cmd:'# HTTPS 格式：\ngit clone https://github.com/user/repo.git\n# 每次 push 需要输入用户名+token', explain:'HTTPS 方式比较简单，但每次需要认证'},{cmd:'# SSH 格式：\ngit clone git@github.com:user/repo.git\n# 配置一次 SSH Key 后免密操作', explain:'SSH 方式更安全更方便，推荐长期使用'}],
+    tip:'新手困惑：该用 HTTPS 还是 SSH？答案：初学者可以用 HTTPS（简单），但推荐尽早配置 SSH Key（免密更安全）。GitHub 已不支持密码认证，必须用 Personal Access Token（HTTPS）或 SSH Key（SSH）。',
+    quiz_q:'GitHub 官方推荐使用哪种方式认证？', quiz_opts:['用户名+密码','Personal Access Token 或 SSH Key','邮箱验证','手机短信验证'], quiz_ans:1 },
+  { id:'public_vs_private', en:'Public vs Private', phonetic:'/ˈpʌblɪk vaɪz ˈpraɪvɪt/', pos:'phrase', cn:'公开仓库 vs 私有仓库 — 新手不知道该选哪个', cat:'新手常见问题', difficulty:'入门',
+    demos:[{cmd:'# 创建仓库时选择：\n# Public = 任何人都能看到（免费）\n# Private = 只有你和受邀者能看到（部分免费）', explain:'公开和私有仓库的区别'}],
+    tip:'新手常问：应该选 Public 还是 Private？答案：学习项目选 Public（免费 + 可以展示给面试官看），商业项目/敏感代码选 Private。Public 仓库的代码任何人都能看到，但不能直接修改（必须 Fork + PR）。',
+    quiz_q:'Public 仓库的特点是？', quiz_opts:['只有你自己能看到','任何人都能看到代码但不能直接修改','需要付费才能创建','不能克隆到本地'], quiz_ans:1 },
+  { id:'gui_vs_cli', en:'GUI vs CLI', phonetic:'/ɡjuːaɪ juː vaɪz siː el aɪ/', pos:'phrase', cn:'图形界面 vs 命令行 — 新手不知道该用哪个', cat:'新手常见问题', difficulty:'入门',
+    demos:[{cmd:'# GUI 工具（图形界面）：\n# GitHub Desktop、Sourcetree、VS Code 内置 Git', explain:'适合新手，可视化操作'},{cmd:'# CLI（命令行）：\n git status\n git add .\n git commit -m "msg"', explain:'适合熟练后使用，更灵活更快'}],
+    tip:'新手困惑：该用图形界面还是命令行？答案：初学者可以用 GitHub Desktop 等图形工具（降低门槛），但建议尽早学命令行（更强大、更通用、面试可能考）。最佳路径：图形工具入门 → 命令行进阶。',
+    quiz_q:'对于 Git 新手，推荐的学习路径是？', quiz_opts:['直接用命令行','先用图形工具入门，再学命令行','只用图形工具就够了','命令行太难不用学'], quiz_ans:1 },
+];
+
+let learned = JSON.parse(localStorage.getItem('gh_learned') || '{}');
+let quizResults = JSON.parse(localStorage.getItem('gh_quiz') || '{}');
+let notes = JSON.parse(localStorage.getItem('gh_notes') || '{}');
+let daily = JSON.parse(localStorage.getItem('gh_daily') || '{}');
+let challengeBest = parseInt(localStorage.getItem('gh_challenge_best')) || 0;
+let currentFilter = 'all';
+let currentSearch = '';
+let focusedIndex = -1;
+
+const MODES = ['browse','challenge','simulator','wrong','notes','trend'];
+const MODE_LABELS = ['\uD83D\uDCC6 \u6D4F\u89C8','\uD83C\uDFAF \u6BCF\u65E5\u6311\u6218','\uD83C\uDFAE \u547D\u4EE4\u6A21\u62DF\u5668','\u274C \u9519\u9898\u672C','\uD83D\uDCDD \u6211\u7684\u7B14\u8BB0','\uD83D\uDCCA \u5B66\u4E60\u8D8B\u52BF'];
+
+function save() {
+  localStorage.setItem('gh_learned', JSON.stringify(learned));
+  localStorage.setItem('gh_quiz', JSON.stringify(quizResults));
+  localStorage.setItem('gh_notes', JSON.stringify(notes));
+  localStorage.setItem('gh_daily', JSON.stringify(daily));
+}
+
+function renderModeTabs() {
+  const container = document.getElementById('modeTabs');
+  container.innerHTML = MODES.map((m, i) =>
+    '<button class="mode-tab' + (i===0?' active':'') + '" onclick="switchMode(\'' + m + '\')">' + MODE_LABELS[i] + '</button>'
+  ).join('');
+}
+
+function switchMode(mode) {
+  MODES.forEach(m => {
+    document.getElementById(m+'Panel').classList.remove('active');
+  });
+  document.getElementById(mode+'Panel').classList.add('active');
+  document.querySelectorAll('.mode-tab').forEach((t,i) => {
+    t.classList.toggle('active', MODES[i] === mode);
+  });
+  if (mode === 'challenge') renderChallenge();
+  if (mode === 'wrong') renderWrongBook();
+  if (mode === 'notes') renderNotes();
+  if (mode === 'trend') renderTrend();
+  if (mode === 'simulator') startSimulator();
+}
+
+function speak(text) {
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+
+// ========== Challenge ==========
+let challengeQuestions = [];
+let challengeIndex = 0;
+let challengeCorrect = 0;
+let challengeTimer = null;
+let challengeSeconds = 0;
+let challengeActive = false;
+
+function renderChallenge() {
+  document.getElementById('challengeStart').style.display = '';
+  document.getElementById('challengeArea').style.display = 'none';
+  document.getElementById('challengeResult').style.display = 'none';
+  const bestEl = document.getElementById('challengeStart').querySelector('p');
+  if (challengeBest > 0) {
+    bestEl.innerHTML = bestEl.innerHTML.split('<br>')[0] + '<br><span style="color:var(--yellow);">\uD83C\uDFC6 \u5386\u53F2\u6700\u9AD8\u5206\uFF1A' + challengeBest + '/5</span>';
+  }
+}
+
+function startChallenge() {
+  const shuffled = [...WORDS].sort(() => Math.random() - 0.5);
+  challengeQuestions = shuffled.slice(0, 5);
+  challengeIndex = 0;
+  challengeCorrect = 0;
+  challengeSeconds = 0;
+  challengeActive = true;
+  document.getElementById('challengeStart').style.display = 'none';
+  document.getElementById('challengeResult').style.display = 'none';
+  document.getElementById('challengeArea').style.display = '';
+  challengeTimer = setInterval(() => {
+    challengeSeconds++;
+    const min = String(Math.floor(challengeSeconds/60)).padStart(2,'0');
+    const sec = String(challengeSeconds%60).padStart(2,'0');
+    document.getElementById('challengeTimer').textContent = '\u23F1 ' + min + ':' + sec;
+  }, 1000);
+  showChallengeQuestion();
+}
+
+function showChallengeQuestion() {
+  const w = challengeQuestions[challengeIndex];
+  document.getElementById('challengeProgress').textContent = '\u7B2C ' + (challengeIndex+1) + ' \u9898 / \u5171 5 \u9898';
+  document.getElementById('challengeQuestion').textContent = w.quiz_q;
+  const optsEl = document.getElementById('challengeOptions');
+  optsEl.innerHTML = w.quiz_opts.map((o, i) =>
+    '<button class="challenge-opt" onclick="answerChallenge(' + i + ',' + w.quiz_ans + ',this)">' + String.fromCharCode(65+i) + '. ' + o + '</button>'
+  ).join('');
+}
+
+function answerChallenge(chosen, correct, btn) {
+  if (!challengeActive) return;
+  const opts = document.querySelectorAll('.challenge-opt');
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === correct) o.classList.add('correct');
+    if (i === chosen && chosen !== correct) o.classList.add('wrong');
+  });
+  if (chosen === correct) challengeCorrect++;
+  setTimeout(() => {
+    challengeIndex++;
+    if (challengeIndex >= challengeQuestions.length) {
+      finishChallenge();
+    } else {
+      showChallengeQuestion();
+    }
+  }, 800);
+}
+
+function finishChallenge() {
+  challengeActive = false;
+  clearInterval(challengeTimer);
+  const pct = Math.round(challengeCorrect / 5 * 100);
+  if (challengeCorrect > challengeBest) {
+    challengeBest = challengeCorrect;
+    localStorage.setItem('gh_challenge_best', challengeBest);
+  }
+  let comment = '';
+  if (challengeCorrect === 5) comment = '\uD83C\uDFC6 \u5B8C\u7F8E\uFF01';
+  else if (challengeCorrect >= 4) comment = '\uD83C\uDF1F \u4E0D\u9519\uFF01';
+  else comment = '\uD83D\uDCAA \u7EE7\u7EED\u52A0\u6CB9\uFF01';
+  const resultEl = document.getElementById('challengeResult');
+  resultEl.style.display = '';
+  resultEl.innerHTML = '<div class="challenge-ring" style="--pct:' + pct + '" data-pct="' + pct + '"></div>' +
+    '<div class="challenge-score">\u7528\u65F6 ' + Math.floor(challengeSeconds/60) + '\u5206' + (challengeSeconds%60) + '\u79D2 | \u6B63\u786E ' + challengeCorrect + '/5</div>' +
+    '<div class="challenge-comment">' + comment + '</div>' +
+    '<button class="btn-primary" onclick="startChallenge()" style="margin-top:10px;">\u518D\u6765\u4E00\u6B21</button>';
+  document.getElementById('challengeArea').style.display = 'none';
+}
+
+// ========== Simulator ==========
+const SCENARIOS = [
+  { scene: "你刚创建了一个新项目文件夹，想把它变成Git仓库", hint: "初始化仓库", answers: ["git init"], explain: "git init 用于在当前目录创建新的Git仓库。" },
+  { scene: "你想把远程仓库 https://github.com/user/repo.git 下载到本地", hint: "克隆仓库", answers: ["git clone https://github.com/user/repo.git"], explain: "git clone 用于从远程仓库完整复制到本地。" },
+  { scene: "你修改了 index.html，想把它加入暂存区准备提交", hint: "添加到暂存区", answers: ["git add index.html"], explain: "git add 把指定文件加入暂存区。" },
+  { scene: "暂存区的变更已经准备好了，你想提交到版本历史", hint: "提交变更", answers: ["git commit -m", "git commit"], explain: "git commit 把暂存区的变更保存到版本历史。-m 参数用于写提交信息。" },
+  { scene: "你想把本地的 main 分支推送到远程 origin", hint: "推送", answers: ["git push origin main"], explain: "git push 把本地提交上传到远程仓库。" },
+  { scene: "你想从远程 origin 拉取 main 分支的最新代码并合并", hint: "拉取", answers: ["git pull origin main", "git pull"], explain: "git pull 从远程下载最新代码并自动合并。" },
+  { scene: "你创建了一个新分支 feature-login 并想切换到它", hint: "创建并切换分支", answers: ["git checkout -b feature-login", "git switch -c feature-login"], explain: "git checkout -b 或 git switch -c 可以创建并立即切换到新分支。" },
+  { scene: "你在 feature-login 分支完成了开发，想把它合并到 main", hint: "合并分支", answers: ["git merge feature-login"], explain: "先切换到 main，然后用 git merge 把 feature-login 的变更合进来。" },
+  { scene: "你提交后发现写错了提交信息，想修改最后一次提交", hint: "修正提交", answers: ["git commit --amend"], explain: "git commit --amend 用于修改最后一次提交的信息或追加变更。" },
+  { scene: "你想临时保存当前未提交的修改，切换到其他分支", hint: "储藏", answers: ["git stash"], explain: "git stash 把当前修改临时保存，让工作区变干净。" }
+];
+
+let simIndex = 0;
+let simHintShown = false;
+
+function startSimulator() {
+  simIndex = 0;
+  simHintShown = false;
+  document.getElementById('simHint').textContent = '\uD83D\uDCA1 \u70B9\u51FB\u663E\u793A\u63D0\u793A';
+  document.getElementById('simHint').classList.remove('show');
+  document.getElementById('simFeedback').className = 'sim-feedback';
+  document.getElementById('simFeedback').style.display = 'none';
+  document.getElementById('simNextBtn').style.display = 'none';
+  document.getElementById('simInput').value = '';
+  showSimScene();
+}
+
+function showSimScene() {
+  const s = SCENARIOS[simIndex];
+  document.getElementById('simSceneTitle').textContent = '\u573A\u666F ' + (simIndex+1) + '/10';
+  document.getElementById('simSceneText').textContent = s.scene;
+  document.getElementById('simProgress').textContent = '\u8FDB\u5EA6\uFF1A' + (simIndex+1) + ' / ' + SCENARIOS.length;
+  document.getElementById('simHint').textContent = '\uD83D\uDCA1 \u70B9\u51FB\u663E\u793A\u63D0\u793A';
+  document.getElementById('simHint').classList.remove('show');
+  simHintShown = false;
+  document.getElementById('simFeedback').className = 'sim-feedback';
+  document.getElementById('simFeedback').style.display = 'none';
+  document.getElementById('simNextBtn').style.display = 'none';
+  document.getElementById('simInput').value = '';
+  document.getElementById('simInput').focus();
+}
+
+function showHint() {
+  if (simHintShown) return;
+  simHintShown = true;
+  const s = SCENARIOS[simIndex];
+  document.getElementById('simHint').textContent = '\uD83D\uDCA1 \u63D0\u793A\uFF1A' + s.hint;
+  document.getElementById('simHint').classList.add('show');
+}
+
+function checkSimAnswer() {
+  const input = document.getElementById('simInput').value.trim().toLowerCase();
+  if (!input) return;
+  const s = SCENARIOS[simIndex];
+  const isCorrect = s.answers.some(a => input.includes(a.toLowerCase()));
+  const fb = document.getElementById('simFeedback');
+  fb.style.display = '';
+  if (isCorrect) {
+    fb.className = 'sim-feedback show pass';
+    fb.textContent = '\u2705 \u6B63\u786E\uFF01' + s.explain;
+    document.getElementById('simNextBtn').style.display = '';
+  } else {
+    fb.className = 'sim-feedback show fail';
+    fb.innerHTML = '\u274C \u4E0D\u6B63\u786E\u3002<br>\u6B63\u786E\u7B54\u6848\u793A\u4F8B\uFF1A' + s.answers[0] + '<br>' + s.explain;
+    document.getElementById('simNextBtn').style.display = '';
+  }
+}
+
+function nextSimScene() {
+  simIndex++;
+  if (simIndex >= SCENARIOS.length) {
+    document.getElementById('simSceneText').textContent = '\uD83C\uDF89 \u5168\u90E8\u5B8C\u6210\uFF01\u4F60\u5DF2\u7ECF\u638C\u63E1\u4E86\u8FD9\u4E9B\u5E38\u7528\u547D\u4EE4\u3002';
+    document.getElementById('simSceneTitle').textContent = '\u5B8C\u6210';
+    document.getElementById('simInput').style.display = 'none';
+    document.getElementById('simInput').nextElementSibling.style.display = 'none';
+    document.getElementById('simHint').style.display = 'none';
+    document.getElementById('simFeedback').style.display = 'none';
+    document.getElementById('simNextBtn').style.display = 'none';
+  } else {
+    showSimScene();
+  }
+}
+
+// ========== Wrong Book ==========
+function renderWrongBook() {
+  const list = document.getElementById('wrongList');
+  const wrongIds = Object.keys(quizResults).filter(id => quizResults[id] && quizResults[id].correct === false);
+  const retestBtn = document.getElementById('retestBtn');
+  if (wrongIds.length === 0) {
+    list.innerHTML = '<div class="empty-state">\uD83C\uDF89 \u6682\u65E0\u9519\u9898\uFF0C\u7EE7\u7EED\u4FDD\u6301\uFF01</div>';
+    retestBtn.style.display = 'none';
+    return;
+  }
+  retestBtn.style.display = '';
+  list.innerHTML = wrongIds.map(id => {
+    const w = WORDS.find(w => w.id === id);
+    if (!w) return '';
+    const result = quizResults[id];
+    const chosenText = result.chosen !== undefined ? w.quiz_opts[result.chosen] : '\u672A\u77E5';
+    const correctText = w.quiz_opts[w.quiz_ans];
+    return '<div class="wrong-card">' +
+      '<div class="wrong-q">' + w.quiz_q + '</div>' +
+      '<div class="wrong-answer wrong-text">\u4F60\u7684\u7B54\u6848\uFF1A' + String.fromCharCode(65+result.chosen) + '. ' + chosenText + '</div>' +
+      '<div class="wrong-answer correct-text">\u6B63\u786E\u7B54\u6848\uFF1A' + String.fromCharCode(65+w.quiz_ans) + '. ' + correctText + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+function retestWrong() {
+  const wrongIds = Object.keys(quizResults).filter(id => quizResults[id] && quizResults[id].correct === false);
+  if (wrongIds.length === 0) return;
+  switchMode('browse');
+  setTimeout(() => {
+    const firstId = wrongIds[0];
+    const card = document.getElementById('card-' + firstId);
+    if (card) card.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 100);
+}
+
+// ========== Notes ==========
+function renderNotes() {
+  const list = document.getElementById('notesList');
+  const noteIds = Object.keys(notes).filter(id => notes[id] && notes[id].trim());
+  if (noteIds.length === 0) {
+    list.innerHTML = '<div class="empty-state">\u8FD8\u6CA1\u6709\u7B14\u8BB0\uFF0C\u5728\u6D4F\u89C8\u6A21\u5F0F\u4E0B\u5199\u70B9\u4EC0\u4E48\u5427\uFF01</div>';
+    return;
+  }
+  list.innerHTML = noteIds.map(id => {
+    const w = WORDS.find(w => w.id === id);
+    const wordName = w ? w.en : id;
+    return '<div class="note-item">' +
+      '<div class="note-word">' + wordName + '</div>' +
+      '<div class="note-content">' + notes[id].replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</div>' +
+      '</div>';
+  }).join('');
+}
+
+// ========== Trend ==========
+function recordDaily(type) {
+  const today = new Date().toISOString().split('T')[0];
+  if (!daily[today]) daily[today] = {learned:0, quizzed:0, correct:0};
+  if (type === 'learned') daily[today].learned++;
+  if (type === 'quizzed') daily[today].quizzed++;
+  if (type === 'correct') daily[today].correct++;
+  save();
+}
+
+function renderTrend() {
+  const chartBars = document.getElementById('chartBars');
+  const trendStats = document.getElementById('trendStats');
+  const dates = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    dates.push(d.toISOString().split('T')[0]);
+  }
+  const data = dates.map(d => daily[d] || {learned:0, quizzed:0, correct:0});
+  const maxVal = Math.max(1, ...data.map(d => Math.max(d.learned, d.quizzed, d.correct)));
+
+  chartBars.innerHTML = data.map((d, i) => {
+    const hL = Math.max(4, d.learned / maxVal * 120);
+    const hQ = Math.max(4, d.quizzed / maxVal * 120);
+    const hC = Math.max(4, d.correct / maxVal * 120);
+    const dateLabel = dates[i].slice(5);
+    return '<div class="chart-bar-wrap">' +
+      '<div class="chart-bar correct" style="height:' + hC + 'px;"></div>' +
+      '<div class="chart-bar quizzed" style="height:' + hQ + 'px;"></div>' +
+      '<div class="chart-bar learned" style="height:' + hL + 'px;"></div>' +
+      '<div class="chart-bar-label">' + dateLabel + '</div>' +
+      '</div>';
+  }).join('');
+
+  const weekLearned = data.reduce((s,d) => s + d.learned, 0);
+  const weekQuizzed = data.reduce((s,d) => s + d.quizzed, 0);
+  const weekCorrect = data.reduce((s,d) => s + d.correct, 0);
+  const rate = weekQuizzed > 0 ? Math.round(weekCorrect/weekQuizzed*100) : 0;
+  trendStats.innerHTML = '\uD83D\uDCCA \u672C\u5468\u638C\u63E1 <strong style="color:var(--green)">' + weekLearned + '</strong> \u8BCD\uFF0C\u672C\u5468\u7B54\u9898 <strong style="color:var(--yellow)">' + weekQuizzed + '</strong> \u9053\uFF0C\u6B63\u786E\u7387 <strong style="color:var(--purple)">' + rate + '%</strong>';
+}
+
+// ========== Cheatsheet ==========
+function toggleCheatsheet() {
+  const body = document.getElementById('csBody');
+  const arrow = document.getElementById('csArrow');
+  body.classList.toggle('show');
+  arrow.textContent = body.classList.contains('show') ? '\u25BC' : '\u25B6';
+}
+
+function cheatSearch(keywords) {
+  switchMode('browse');
+  document.getElementById('searchInput').value = keywords;
+  doSearch(keywords);
+}
+
+// ========== 原有功能 ==========
+function getCats() {
+  const s = new Set(WORDS.map(w => w.cat));
+  return [...s];
+}
+
+function renderNav() {
+  const nav = document.getElementById('navList');
+  const cats = getCats();
+  let html = '<div class="nav-item active" onclick="filterCat(&quot;all&quot;, this)"><span style="width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0"></span>\u5168\u90E8\u8BCD\u6C47<span class="ni-count">' + WORDS.length + '</span></div>';
+  cats.forEach(c => {
+    const count = WORDS.filter(w=>w.cat===c).length;
+    html += '<div class="nav-item" onclick="filterCat(\'' + c + '\', this)"><span style="width:6px;height:6px;border-radius:50%;background:var(--green);flex-shrink:0"></span>' + c + '<span class="ni-count">' + count + '</span></div>';
+  });
+  nav.innerHTML = html;
+}
+
+function renderFilterBar() {
+  const bar = document.getElementById('filterBar');
+  const diffs = ['\u5168\u90E8','\u5165\u95E8','\u8FDB\u9636'];
+  bar.innerHTML = diffs.map((d,i) => '<button class="filter-tag' + (i===0?' active':'') + '" onclick="filterDiff(\'' + (i===0?'all':d) + '\', this)">' + d + '</button>').join('');
+}
+
+function filterDiff(d, el) {
+  currentFilter = d;
+  document.querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderList();
+}
+
+function filterCat(cat, el) {
+  currentFilter = cat;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.filter-tag').forEach(t => { if(t.textContent==='\u5168\u90E8') t.classList.add('active'); else t.classList.remove('active'); });
+  renderList();
+}
+
+function doSearch(v) {
+  currentSearch = v.toLowerCase();
+  renderList();
+}
+
+function renderList() {
+  const list = document.getElementById('wordList');
+  let filtered = WORDS;
+  if (currentFilter === '\u5165\u95E8' || currentFilter === '\u8FDB\u9636') {
+    filtered = filtered.filter(w => w.difficulty === currentFilter);
+  } else if (currentFilter !== 'all') {
+    filtered = filtered.filter(w => w.cat === currentFilter);
+  }
+  if (currentSearch) {
+    filtered = filtered.filter(w => w.en.toLowerCase().includes(currentSearch) || w.cn.toLowerCase().includes(currentSearch) || w.cat.includes(currentSearch));
+  }
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">\u6CA1\u6709\u627E\u5230\u5339\u914D\u7684\u8BCD\u6C47<br>\u8BD5\u8BD5\u5176\u4ED6\u5173\u952E\u8BCD</div>';
+  } else {
+    list.innerHTML = filtered.map((w,i) => {
+      const realIdx = WORDS.indexOf(w);
+      const isLearned = learned[w.id];
+      const noteVal = (notes[w.id] || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      return '<div class="word-card' + (isLearned?' learned':'') + '" id="card-' + w.id + '">' +
+        '<div class="word-card-header" onclick="toggleCard(\'' + w.id + '\')">' +
+          '<span class="wc-num">' + (realIdx+1) + '</span>' +
+          '<span class="wc-en">' + w.en + '</span>' +
+          '<span class="wc-phonetic">' + w.phonetic + '</span>' +
+          '<span class="wc-pos">' + w.pos + '</span>' +
+          '<button class="speak-btn" onclick="event.stopPropagation();speak(\'' + w.en + '\')" title="\u53D1\u97F3">\uD83D\uDD0A</button>' +
+          '<span class="wc-check">\u2705</span>' +
+          '<span class="wc-arrow">\u25BC</span>' +
+        '</div>' +
+        '<div class="word-card-body">' +
+          '<div class="wc-cn">' + w.cn + '</div>' +
+            '<div class="section-title">\uD83D\uDDCB\uFE0F Git \u5B9E\u64CD</div>' +
+            w.demos.map(d => '<div class="git-demo"><div class="cmd">' + d.cmd + '</div><div class="explain">' + d.explain + '</div>' + (d.output?'<div class="output">' + d.output + '</div>':'') + '</div>').join('') +
+            '<div class="tip-box">\uD83D\uDCA1 <strong>\u8BB0\u5FC6\u6280\u5DE7\uFF1A</strong>' + w.tip + '</div>' +
+            '<div class="section-title">\uD83E\uDDE0 \u968F\u5802\u6D4B\u9A8C</div>' +
+            '<div class="quiz' + (quizResults[w.id]!==undefined?' done':'') + '" id="quiz-' + w.id + '">' +
+              '<div class="quiz-q">' + w.quiz_q + '</div>' +
+              '<div class="quiz-opts">' +
+                w.quiz_opts.map((o,oi) => {
+                  const isDone = quizResults[w.id] !== undefined;
+                  const isCorrect = oi === w.quiz_ans;
+                  let cls = 'quiz-opt';
+                  if (isDone) {
+                    if (isCorrect) cls += ' correct';
+                    if (quizResults[w.id] && quizResults[w.id].chosen === oi && !quizResults[w.id].correct) {
+                      cls += ' wrong';
+                    }
+                  }
+                  return '<button class="' + cls + '" ' + (isDone?'disabled':'') + ' onclick="answerQuiz(\'' + w.id + '\',' + oi + ',' + w.quiz_ans + ',this)">' + String.fromCharCode(65+oi) + '. ' + o + '</button>';
+                }).join('') +
+              '</div>' +
+              '<div class="quiz-result ' + (quizResults[w.id]!==undefined?' show':'') + ' ' + (quizResults[w.id]&&quizResults[w.id].correct?'pass':'fail') + '" id="qr-' + w.id + '">' + (quizResults[w.id]!==undefined?(quizResults[w.id].correct?'\u2705 \u6B63\u786E\uFF01':'\u274C \u7B54\u9519\u4E86\uFF0C\u6B63\u786E\u7B54\u6848\u662F ' + String.fromCharCode(65+w.quiz_ans)):'') + '</div>' +
+            '</div>' +
+            '<div class="note-box">' +
+              '<div class="note-label">\uD83D\uDCDD \u6211\u7684\u7B14\u8BB0</div>' +
+              '<textarea placeholder="\u5199\u70B9\u4EC0\u4E48\u2026" onblur="saveNote(\'' + w.id + '\', this)">' + noteVal + '</textarea>' +
+            '</div>' +
+            '<button class="mark-learned-btn' + (isLearned?' done':'') + '" id="btn-' + w.id + '" onclick="toggleLearned(\'' + w.id + '\')">' + (isLearned?'\u2705 \u5DF2\u638C\u63E1':'\u6807\u8BB0\u4E3A\u5DF2\u638C\u63E1') + '</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  const learnedCount = Object.keys(learned).filter(k=>learned[k]).length;
+  const quizzedCount = Object.keys(quizResults).length;
+  const rightCount   = Object.values(quizResults).filter(r => r.correct).length;
+  document.getElementById('statTotal').textContent = WORDS.length;
+  document.getElementById('totalWords').textContent = WORDS.length;
+  document.getElementById('headerCount').textContent = WORDS.length;
+  document.getElementById('statLearned').textContent = learnedCount;
+  document.getElementById('statQuizzed').textContent = quizzedCount;
+  document.getElementById('statRight').textContent = rightCount;
+  const pct = WORDS.length ? Math.round(learnedCount/WORDS.length*100) : 0;
+  document.getElementById('sidebarProgress').style.width = pct + '%';
+  document.getElementById('sidebarProgressText').textContent = learnedCount + ' / ' + WORDS.length + ' \u5DF2\u638C\u63E1';
+}
+
+function toggleCard(id) {
+  document.getElementById('card-'+id).classList.toggle('expanded');
+}
+
+function answerQuiz(wordId, chosen, correct, btn) {
+  const quiz = document.getElementById('quiz-'+wordId);
+  if (quiz.classList.contains('done')) return;
+  quiz.classList.add('done');
+  const isRight = chosen === correct;
+  quizResults[wordId] = {correct: isRight, chosen: chosen};
+  save();
+  recordDaily('quizzed');
+  if (isRight) recordDaily('correct');
+  const opts = quiz.querySelectorAll('.quiz-opt');
+  opts.forEach((o, i) => {
+    o.disabled = true;
+    if (i === correct) o.classList.add('correct');
+    if (i === chosen && !isRight) o.classList.add('wrong');
+  });
+  const qr = document.getElementById('qr-'+wordId);
+  qr.classList.add('show');
+  if (isRight) { qr.classList.add('pass'); qr.textContent = '\u2705 \u6B63\u786E\uFF01'; }
+  else { qr.classList.add('fail'); qr.textContent = '\u274C \u7B54\u9519\u4E86\uFF0C\u6B63\u786E\u7B54\u6848\u662F ' + String.fromCharCode(65+correct); }
+  renderList();
+}
+
+function toggleLearned(id) {
+  learned[id] = !learned[id];
+  save();
+  if (learned[id]) recordDaily('learned');
+  renderList();
+  if (learned[id]) {
+    const card = document.getElementById('card-'+id);
+    card.classList.add('expanded');
+  }
+}
+
+function saveNote(id, textarea) {
+  notes[id] = textarea.value;
+  save();
+}
+
+// ========== 快捷键 ==========
+document.addEventListener('keydown', function(e) {
+  const inInput = e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA';
+  if (e.key === '/' && !inInput) {
+    e.preventDefault();
+    const activeTab = document.querySelector('.mode-tab.active');
+    if (activeTab && activeTab.textContent.includes('\u6D4F\u89C8')) {
+      document.getElementById('searchInput').focus();
+    } else {
+      switchMode('browse');
+      setTimeout(() => document.getElementById('searchInput').focus(), 100);
+    }
+    return;
+  }
+  if (e.key === 'Escape' && inInput) {
+    e.target.blur();
+    return;
+  }
+  if (inInput) return;
+  if (e.key >= '1' && e.key <= '6') {
+    const idx = parseInt(e.key) - 1;
+    if (idx < MODES.length) switchMode(MODES[idx]);
+    return;
+  }
+  const cards = document.querySelectorAll('.word-card');
+  if (cards.length === 0) return;
+  if (e.key === 'j') {
+    e.preventDefault();
+    focusedIndex = Math.min(focusedIndex + 1, cards.length - 1);
+    updateFocus(cards);
+  } else if (e.key === 'k') {
+    e.preventDefault();
+    focusedIndex = Math.max(focusedIndex - 1, 0);
+    updateFocus(cards);
+  } else if (e.key === 'Enter' && focusedIndex >= 0) {
+    e.preventDefault();
+    const id = cards[focusedIndex].id.replace('card-','');
+    toggleCard(id);
+  } else if (e.key === 'l' && focusedIndex >= 0) {
+    e.preventDefault();
+    const id = cards[focusedIndex].id.replace('card-','');
+    toggleLearned(id);
+  }
+});
+
+function updateFocus(cards) {
+  cards.forEach((c, i) => c.classList.toggle('focused', i === focusedIndex));
+  if (focusedIndex >= 0 && cards[focusedIndex]) {
+    cards[focusedIndex].scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+// ========== 初始化 ==========
+renderModeTabs();
+renderNav();
+renderFilterBar();
+renderList();
+
+</script>
+</body>
+</html>
